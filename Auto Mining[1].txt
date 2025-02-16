@@ -1,0 +1,75 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HarvestEvent = ReplicatedStorage.Events.Harvest.Harvest
+
+local locations = {
+    {name = "Emerald", x = 1639, y = -249, z = -3666, id = "e5c88857-c81c-d73b-3546-98a64dc2dec5"},
+    {name = "Amberite", x = 1639, y = -249, z = -3666, id = "aa45535c-268d-c6c4-de34-fffcef572ada"},
+    {name = "Amberite", x = 1563, y = -249, z = -3946, id = "d1e35abf-75f4-1e7e-dede-9ef5895cb396"},
+    {name = "Emerald", x = 1719, y = -249, z = -4022, id = "61d7553e-6bf6-72e1-b94c-656a1821e7f3"},
+    {name = "Emberstone", x = 1639, y = -248, z = -4456, id = "35deb192-fe1f-2b41-8ff4-74bbec1f1395"},
+    {name = "Amberite", x = 1639, y = -248, z = -4456, id = "4c84543c-e511-6dc2-c9d1-959e7bd98196"},
+    {name = "Emerald", x = 1685, y = -249, z = -4587, id = "5e679e38-69d3-6ee5-859e-5d5eb83565c2"},
+    {name = "Emerald", x = 1577, y = -248, z = -4818, id = "584929df-72d2-33d6-1ddc-e358c49eeece"},
+    {name = "Emerald", x = 1465, y = -249, z = -4761, id = "156a9fa5-3d37-3932-a551-2c1bcf148e7e"},
+    {name = "Amberite", x = 1329, y = -249, z = -4806, id = "8bd27e5c-ccee-d273-12e8-cdb2164531b4"},
+    {name = "Emberstone", x = 1329, y = -249, z = -4806, id = "933edf95-495a-abf5-c654-e11e11dc4a54"},
+    {name = "Emerald", x = 1169, y = -249, z = -5212, id = "993a29fc-cf52-e3bd-5f48-a89c7858caa4"},
+    {name = "Amethys", x = 1094, y = -249, z = -4751, id = "d9cdfff8-adf4-67a3-6422-36a1cbd77485"},
+    {name = "Emberstone", x = 1610, y = -249, z = -5020, id = "db5449a3-e91e-3ee8-cdeb-c232fc9f94cf"},
+    {name = "Amethys", x = 1610, y = -249, z = -5020, id = "c3e9eeb5-cdba-12e4-c283-d2b8bad7c16f"},
+    {name = "Emerald", x = 1484, y = -249, z = -5199, id = "58dec845-81b2-8cdc-fbcb-93ab3764bc7d"},
+    {name = "Emerald", x = 1000, y = -249, z = -4417, id = "1e5ebc85-1491-2221-c42a-e45b3484ad7c"},
+    {name = "Amethys", x = 1176, y = -249, z = -4273, id = "527e248a-71de-e294-be6d-e43e73347f22"},
+    {name = "Emerald", x = 1287, y = -249, z = -4267, id = "9fd2ea56-aa5b-6b37-bf6b-e2e6a7755c6c"},
+    {name = "Emberstone", x = 1300, y = -249, z = -4154, id = "bd1aee9d-a89e-ffbc-d6ae-d3143cde9175"},
+    {name = "Amberite", x = 1374, y = -248, z = -3959, id = "cec788df-597d-4e82-c7c6-26b733aaaa64"},
+    {name = "Amethys", x = 1132, y = -249, z = -4027, id = "917f3ce2-6b81-866e-8e84-1c34d92d6cae"},
+    {name = "Amberite", x = 1132, y = -249, z = -4027, id = "d4e9119f-52d1-bd99-712c-aecde667cebe"},
+    {name = "Emberstone", x = 886, y = -249, z = -3846, id = "e963f42f-1b5c-5231-38e7-daa15a2f29d1"},
+    {name = "Amberite", x = 662, y = -249, z = -4104, id = "caf62158-e73b-6f37-f73d-e83e962f9439"},
+    {name = "Amethys", x = 640, y = -249, z = -4455, id = "fef536e4-1997-266b-95b2-4e7416dd21c9"},
+    {name = "Emberstone", x = 669, y = 249, z = -4603, id = "1a29ebf2-c278-c56d-d599-578183be4391"},
+    {name = "Amethys", x = 782, y = -249, z = -4593, id = "c51d317a-d322-8ad9-4d54-81f8bd72b346"},
+    {name = "Amberite", x = 12388, y = 44, z = -970, id = "ead534eb-85fd-c82d-dd35-63c88ddf6d31"},
+    {name = "Emerald", x = 12280, y = 44, z = -1130, id = "b44ea1e7-ecd3-68db-41a6-5fa48e6dee44"},
+    {name = "Amberite", x = 12559, y = 44, z = -746, id = "6d8a9da6-75e5-5d23-e59c-eba9b9e6b12d"},
+    {name = "Emerald", x = 12559, y = 44, z = -746, id = "5efa8961-3ede-6dc8-532e-8587b84d9797"},
+    {name = "Amberite", x = 12200, y = -135, z = -513, id = "cd3eeefa-cb63-1aef-b761-5f8a72d7a6f2"},
+    {name = "Emerald", x = 12311, y = -135, z = -620, id = "fe93a839-ae33-dee7-f6da-9dbada8773ef"},
+    {name = "Emerald", x = 11965, y = -135, z = -721, id = "fe93a839-ae33-dee7-f6da-9dbada8773ef"},
+    {name = "Amberite", x = 12185, y = -125, z = -785, id = "e52a7f1b-cee4-75d6-d277-ed47e7e13c95"},
+    {name = "Emberstone", x = 12185, y = -125, z = -785, id = "bd63ecc8-998f-4f7f-de45-e8db94e1745b"},
+    {name = "Amethys", x = 12212, y = -135, z = -976, id = "58c8a7a7-aab9-b7b1-8c53-8afda6afe26f"},
+    {name = "Amethys", x = 12647, y = -56, z = -992, id = "3e55ed7c-ac1e-c696-6de6-936d4ec64c5c"},
+    {name = "Emerald", x = 12731, y = -134, z = -907, id = "6bf89f12-fe3e-4555-2c3b-e7f3313d1e3d"},
+    {name = "Amethys", x = 12703, y = -386, z = -1153, id = "f4bd3ecc-7363-a8fe-f235-b3d32ede9722"},
+    {name = "Amberstone", x = 12703, y = -386, z = -1153, id = "d9a3b149-48f6-edae-66f2-61e763ec17d6"},
+    {name = "Amethys", x = 12360, y = -358, z = -949, id = "e16b1e43-1aee-f6ff-3f7e-3e96dcdf1a6a"},
+    {name = "Amethys", x = 11971, y = -381, z = -372, id = "ee32f58e-8ad2-52c2-b5e1-65e731571697"},
+    {name = "Amberstone", x = 11971, y = -381, z = -372, id = "f3211ce5-1f28-1cca-46b8-763e369a5eb9"},
+    {name = "Amberite", x = 12220, y = -418, z = -1407, id = "eedd9e26-835a-9838-491e-76e9b4debad2"}
+}
+
+local function teleportAndHarvest(location)
+    -- Teleport to the location
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(location.x, location.y, location.z)
+    
+    -- Wait 0.5 seconds after teleportation
+    wait(0.5)
+    
+    -- Harvest
+    local args = {
+        [1] = "Harvest",
+        [2] = location.id
+    }
+    HarvestEvent:FireServer(unpack(args))
+    
+    -- Wait 8 seconds before moving to the next location
+    wait(8)
+end
+
+while true do
+    for _, location in ipairs(locations) do
+        teleportAndHarvest(location)
+    end
+end
