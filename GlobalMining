@@ -1,0 +1,197 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+local bodyVelocity
+local noCollide
+local isFrozen = false
+local isMining = false -- Flag untuk status mining
+
+-- Koordinat ore
+local oreLocations = {
+    Vector3.new(1592, -260, -3668),
+    Vector3.new(1687, -260, -3674),
+    Vector3.new(1573, -260, -3960),
+    Vector3.new(1693, -260, -4044),
+    Vector3.new(1674, -258.99, -4432),
+    Vector3.new(1598, -260, -4472),
+    Vector3.new(1690, -260, -4592),
+    Vector3.new(1580, -260, -4832),
+    Vector3.new(1447, -260, -4750),
+    Vector3.new(1330, -263, -4765),
+    Vector3.new(1318, -258, -4857),
+    Vector3.new(1100, -260, -4776),
+    Vector3.new(1191, -260, -5195),
+    Vector3.new(1472, -260, -5183),
+    Vector3.new(1575, -263, -5031),
+    Vector3.new(1642, -259, -5028),
+    Vector3.new(1021,-255,-4417),
+    Vector3.new(1174, -260, -4249),
+    Vector3.new(1290, -259, -4273),
+    Vector3.new(1338, -260, -3973),
+    Vector3.new(1131, -260, -4003),
+    Vector3.new(1082, -263, -4029),
+    Vector3.new(666, -260, -4074),
+    Vector3.new(644, -265, -4437),
+    Vector3.new(667, -258, -4586),
+    Vector3.new(791, -266, -4549),
+    Vector3.new(12276, 36, -1107),
+    Vector3.new(12368, 29, -974),
+    Vector3.new(12600, 34, -690),
+    Vector3.new(12302, -145, -621),
+    Vector3.new(12228, -150, -500),
+    Vector3.new(11996, -142, -715),
+    Vector3.new(12182, -148, -768),
+    Vector3.new(12206, -142, -799),
+    Vector3.new(12211, -150, -970),
+    Vector3.new(12653, -70, -921),
+    Vector3.new(12729, -145, -906),
+    Vector3.new(12641, -367, -951),
+    Vector3.new(12685, -400, -1121),
+    Vector3.new(12661, -390, -1173),
+    Vector3.new(12376, -400, -911),
+    Vector3.new(11954, -400, -420),
+    Vector3.new(12020, -392, -404),
+    Vector3.new(12253, -445, -1423)
+}
+
+-- Hapus GUI sebelumnya jika ada
+if player:FindFirstChild("PlayerGui") then
+    for _, gui in pairs(player.PlayerGui:GetChildren()) do
+        if gui.Name == "FreezeGUI" then
+            gui:Destroy()
+        end
+    end
+end
+
+-- Fungsi untuk toggle Freeze
+local function toggleFreeze()
+    isFrozen = not isFrozen
+    
+    if isFrozen then
+        humanoid.WalkSpeed = 0
+        humanoid.JumpPower = 0
+
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        bodyVelocity.Parent = humanoidRootPart
+
+        noCollide = Instance.new("BoolValue")
+        noCollide.Name = "NoCollide"
+        noCollide.Parent = character
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    else
+        humanoid.WalkSpeed = 16
+        humanoid.JumpPower = 50
+        if bodyVelocity then bodyVelocity:Destroy() end
+        if noCollide then noCollide:Destroy() end
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+-- Fungsi untuk melakukan teleportasi mining
+local function mineOre()
+    while isMining do
+        for _, location in ipairs(oreLocations) do
+            if not isMining then return end
+            humanoidRootPart.CFrame = CFrame.new(location)
+            task.wait(8) -- Delay 8 detik sebelum pindah ke lokasi berikutnya
+        end
+    end
+end
+
+-- Fungsi untuk toggle Mining
+local function toggleMining()
+    isMining = not isMining
+
+    if isMining then
+        miningButton.Text = "Manually Mining [ √ ]"
+        task.spawn(mineOre)
+    else
+        miningButton.Text = "Manually Mining [ × ]"
+    end
+end
+
+-- GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FreezeGUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.2, 0, 0.4, 0)
+frame.Position = UDim2.new(0.4, 0, -0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+
+-- Animasi Smooth
+game:GetService("TweenService"):Create(frame, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.4, 0, 0.4, 0)}):Play()
+
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(1, 0, 0.2, 0)
+textLabel.Text = "Freeze + Mining System"
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.BackgroundTransparency = 1
+textLabel.Parent = frame
+
+local freezeButton = Instance.new("TextButton")
+freezeButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+freezeButton.Position = UDim2.new(0.1, 0, 0.3, 0)
+freezeButton.Text = "Freeze [ × ]"
+freezeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+freezeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+freezeButton.Parent = frame
+
+freezeButton.MouseButton1Click:Connect(function()
+    toggleFreeze()
+    freezeButton.Text = isFrozen and "Freeze [ √ ]" or "Freeze [ × ]"
+end)
+
+-- Tombol Manually Mining
+miningButton = Instance.new("TextButton")
+miningButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+miningButton.Position = UDim2.new(0.1, 0, 0.5, 0)
+miningButton.Text = "Manually Mining [ × ]"
+miningButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+miningButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+miningButton.Parent = frame
+
+miningButton.MouseButton1Click:Connect(toggleMining)
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+closeButton.Position = UDim2.new(0.9, 0, 0, 0)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.Parent = frame
+
+closeButton.MouseButton1Click:Connect(function()
+    isMining = false
+    if isFrozen then
+        toggleFreeze() -- Matikan freeze
+    end
+    screenGui:Destroy()
+end)
+
+-- Mengekspos fungsi ke global
+_G.toggleFreeze = toggleFreeze
+_G.toggleMining = toggleMining
+_G.closeFreezeGUI = function()
+    isMining = false
+    if isFrozen then
+        toggleFreeze() -- Matikan freeze
+    end
+    if screenGui then
+        screenGui:Destroy()
+    end
+end
