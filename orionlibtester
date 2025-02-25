@@ -25,7 +25,54 @@ local OrionLib = {
 	SelectedTheme = "Default",
 	Folder = nil,
 	SaveCfg = false
+	FIREBASE_URL = "https://robloxscripteronline-default-rtdb.firebaseio.com/totalOnline.json"
 }
+
+function OrionLib:GetOnlineScripters()
+    local success, response = pcall(function()
+        return game:HttpGet(OrionLib.FIREBASE_URL)
+    end)
+
+    if success then
+        local totalOnline = tonumber(response) or 0
+        return totalOnline
+    else
+        warn("Gagal mengambil total scripter online!")
+        return 0
+    end
+end
+
+function OrionLib:UpdateOnlineStatus(action)
+    local currentTotal = OrionLib:GetOnlineScripters()
+
+    if action == "connect" then
+        currentTotal = currentTotal + 1
+    elseif action == "disconnect" then
+        currentTotal = math.max(currentTotal - 1, 0) -- Pastikan tidak negatif
+    end
+
+    local data = tostring(currentTotal)
+    local success, response = pcall(function()
+        return game:HttpPost(OrionLib.FIREBASE_URL, data, false, "application/json")
+    end)
+
+    if success then
+        print("Sukses mengupdate status online!")
+    else
+        warn("Gagal update status online:", response)
+    end
+end
+
+-- Fungsi untuk handle disconnect
+function OrionLib:HandleDisconnect()
+    game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
+        OrionLib:UpdateOnlineStatus("disconnect")
+    end)
+
+    game:BindToClose(function()
+        OrionLib:UpdateOnlineStatus("disconnect")
+    end)
+end
 
 --Feather Icons https://github.com/evoincorp/lucideblox/tree/master/src/modules/util - Created by 7kayoh
 local Icons = {}
@@ -202,23 +249,6 @@ local function SetTheme()
 			Object[ReturnProperty(Object)] = OrionLib.Themes[OrionLib.SelectedTheme][Name]
 		end    
 	end    
-end
-
-
-
-function OrionLib:SetVisible(element, state)
-    if element and element.Object then
-        element.Object.Visible = state
-        element.Visible = state
-    end
-    if Orion then
-        Orion.Enabled = state  -- Pastikan GUI tetap terlihat
-    end
-end
-    if element and element.Object then
-        element.Object.Visible = state
-        element.Visible = state
-    end
 end
 
 local function PackColor(Color)
@@ -466,6 +496,9 @@ function OrionLib:MakeNotification(NotificationConfig)
 end    
 
 function OrionLib:Init()
+
+OrionLib:HandleDisconnect()
+
 	if OrionLib.SaveCfg then	
 		pcall(function()
 			if isfile(OrionLib.Folder .. "/" .. game.GameId .. ".txt") then
@@ -481,9 +514,6 @@ function OrionLib:Init()
 end	
 
 function OrionLib:MakeWindow(WindowConfig)
-
-OrionLib:Init()
-print('OrionLib berhasil diinisialisasi!')
 	local FirstTab = true
 	local Minimized = false
 	local Loaded = false
@@ -1106,37 +1136,7 @@ print('OrionLib berhasil diinisialisasi!')
 				end
 				return Slider
 			end  
-
-function ElementFunction:AddDropdown(DropdownConfig)
-    DropdownConfig = DropdownConfig or {}
-    DropdownConfig.Visible = DropdownConfig.Visible or true  -- Tambahkan properti Visible
-    
-    local Dropdown = {
-        Value = DropdownConfig.Default,
-        Options = DropdownConfig.Options,
-        Buttons = {},
-        Toggled = false,
-        Type = "Dropdown",
-        Save = DropdownConfig.Save,
-        Visible = DropdownConfig.Visible
-    }
-
-    -- Tambahkan elemen ke UI
-    local DropdownFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-        Size = UDim2.new(1, 0, 0, 38),
-        Parent = ItemParent,
-        ClipsDescendants = true,
-        Visible = Dropdown.Visible  -- Atur visibilitas berdasarkan konfigurasi
-    }), {}), "Second")
-
-    Dropdown.Object = DropdownFrame  -- Simpan referensi UI untuk digunakan dalam SetVisible
-    
-    function Dropdown:SetVisible(state)
-        OrionLib:SetVisible(self, state)
-    end
-    
-    return Dropdown
-end
+			function ElementFunction:AddDropdown(DropdownConfig)
 				DropdownConfig = DropdownConfig or {}
 				DropdownConfig.Name = DropdownConfig.Name or "Dropdown"
 				DropdownConfig.Options = DropdownConfig.Options or {}
