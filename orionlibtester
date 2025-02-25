@@ -205,7 +205,16 @@ local function SetTheme()
 end
 
 
+
 function OrionLib:SetVisible(element, state)
+    if element and element.Object then
+        element.Object.Visible = state
+        element.Visible = state
+    end
+    if Orion then
+        Orion.Enabled = state  -- Pastikan GUI tetap terlihat
+    end
+end
     if element and element.Object then
         element.Object.Visible = state
         element.Visible = state
@@ -472,6 +481,9 @@ function OrionLib:Init()
 end	
 
 function OrionLib:MakeWindow(WindowConfig)
+
+OrionLib:Init()
+print('OrionLib berhasil diinisialisasi!')
 	local FirstTab = true
 	local Minimized = false
 	local Loaded = false
