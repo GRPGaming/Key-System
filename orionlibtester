@@ -451,6 +451,8 @@ end
 function OrionLib:Init()
     -- Handle disconnect saat pemain keluar
     OrionLib:HandleDisconnect()
+    self:MonitorPlayers()
+
 
     if OrionLib.SaveCfg then	
         pcall(function()
@@ -1729,6 +1731,23 @@ function OrionLib:Destroy()
 end
 
 local HttpService = game:GetService("HttpService")
+
+function OrionLib:MonitorPlayers()
+    -- Event saat pemain masuk
+    game.Players.PlayerAdded:Connect(function(player)
+        OrionLib:UpdateOnlineStatus("connect")
+        print("[Monitor] " .. player.Name .. " telah terhubung.")
+    end)
+
+    -- Event saat pemain keluar
+    game.Players.PlayerRemoving:Connect(function(player)
+        OrionLib:UpdateOnlineStatus("disconnect")
+        print("[Monitor] " .. player.Name .. " telah keluar.")
+    end)
+end
+
+-- Panggil fungsi pemantauan saat library dimulai
+OrionLib:MonitorPlayers()
 
 -- Ganti dengan URL API dari Cloudflare Workers
 local API_URL = "https://noisy-art-4c19.zerostarnew.workers.dev/"
