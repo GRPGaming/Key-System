@@ -1728,17 +1728,19 @@ function OrionLib:Destroy()
 	Orion:Destroy()
 end
 
--- Firebase Integration for Online Scripters
-OrionLib.FIREBASE_URL = "https://robloxscripteronline-default-rtdb.firebaseio.com/totalOnline.json"
+local HttpService = game:GetService("HttpService")
+
+-- Ganti dengan URL API dari Cloudflare Workers
+local API_URL = "https://noisy-art-4c19.zerostarnew.workers.dev/"
 
 function OrionLib:GetOnlineScripters()
     local success, response = pcall(function()
-        return game:HttpGet(OrionLib.FIREBASE_URL)
+        return HttpService:GetAsync(API_URL)
     end)
 
     if success then
-        local totalOnline = tonumber(response) or 0
-        return totalOnline
+        local data = HttpService:JSONDecode(response)
+        return data.totalOnline or 0
     else
         warn("Gagal mengambil total scripter online!")
         return 0
@@ -1746,20 +1748,18 @@ function OrionLib:GetOnlineScripters()
 end
 
 function OrionLib:UpdateOnlineStatus(action)
-    local success, response = pcall(function()
-        return game:HttpGet(OrionLib.FIREBASE_URL)
-    end)
+    local currentTotal = OrionLib:GetOnlineScripters()
 
-    local currentTotal = tonumber(response) or 0 -- Jika response `null`, gunakan 0
-    
     if action == "connect" then
         currentTotal = currentTotal + 1
     elseif action == "disconnect" then
-        currentTotal = math.max(currentTotal - 1, 0) -- Pastikan tidak negatif
+        currentTotal = math.max(currentTotal - 1, 0)
     end
 
+    local dataToSend = HttpService:JSONEncode({ totalOnline = currentTotal })
+
     local successPost, responsePost = pcall(function()
-        return game:HttpPost(OrionLib.FIREBASE_URL, tostring(currentTotal), false, "application/json")
+        return HttpService:PostAsync(API_URL, dataToSend, Enum.HttpContentType.ApplicationJson)
     end)
 
     if successPost then
@@ -1768,6 +1768,5 @@ function OrionLib:UpdateOnlineStatus(action)
         warn("Gagal memperbarui status online:", responsePost)
     end
 end
-
 
 return OrionLib
