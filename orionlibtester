@@ -1746,34 +1746,28 @@ function OrionLib:GetOnlineScripters()
 end
 
 function OrionLib:UpdateOnlineStatus(action)
-    local currentTotal = OrionLib:GetOnlineScripters()
+    local success, response = pcall(function()
+        return game:HttpGet(OrionLib.FIREBASE_URL)
+    end)
 
+    local currentTotal = tonumber(response) or 0 -- Jika response `null`, gunakan 0
+    
     if action == "connect" then
         currentTotal = currentTotal + 1
     elseif action == "disconnect" then
         currentTotal = math.max(currentTotal - 1, 0) -- Pastikan tidak negatif
     end
 
-    local data = tostring(currentTotal)
-    local success, response = pcall(function()
-        return game:HttpPost(OrionLib.FIREBASE_URL, data, false, "application/json")
+    local successPost, responsePost = pcall(function()
+        return game:HttpPost(OrionLib.FIREBASE_URL, tostring(currentTotal), false, "application/json")
     end)
 
-    if success then
-        print("Sukses mengupdate status online!")
+    if successPost then
+        print("Sukses memperbarui status online: " .. currentTotal)
     else
-        warn("Gagal update status online:", response)
+        warn("Gagal memperbarui status online:", responsePost)
     end
 end
 
-function OrionLib:HandleDisconnect()
-    game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
-        OrionLib:UpdateOnlineStatus("disconnect")
-    end)
-
-    game:BindToClose(function()
-        OrionLib:UpdateOnlineStatus("disconnect")
-    end)
-end
 
 return OrionLib
