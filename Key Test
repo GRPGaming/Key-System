@@ -1,6 +1,2 @@
--- Protected.lua
--- Define the valid key
+-- Key%20Test.lua
 sf_key = "Owner"
-
--- Optional: Add some security measures to prevent tampering
-getgenv().sf_key = sf_key -- Store the key in the global environment
