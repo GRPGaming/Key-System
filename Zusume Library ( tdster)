@@ -690,7 +690,12 @@ local NoButton = MakeElement("Button")
 NoButton.Parent = ButtonFrame
 NoButton.Size = UDim2.new(0.45, -5, 0.8, 0) -- Perbesar tombol agar lebih terlihat
 NoButton.Position = UDim2.new(0, 10, 0, 5) -- Beri padding kiri
-NoButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+NoButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Warna abu-abu tua
+NoButton.BorderSizePixel = 0 -- Hilangkan border default
+
+-- Efek stroke pada tombol
+local NoStroke = MakeElement("Stroke", Color3.fromRGB(90, 90, 90), 1.5) -- Sedikit lebih terang dari tombol
+NoStroke.Parent = NoButton
 
 local NoLabel = MakeElement("Label", "NO", 14)
 NoLabel.Parent = NoButton
@@ -706,7 +711,12 @@ local YesButton = MakeElement("Button")
 YesButton.Parent = ButtonFrame
 YesButton.Size = UDim2.new(0.45, -5, 0.8, 0) -- Perbesar tombol agar lebih terlihat
 YesButton.Position = UDim2.new(0.55, 0, 0, 5) -- Beri padding kanan
-YesButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+YesButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Warna abu-abu tua
+YesButton.BorderSizePixel = 0 -- Hilangkan border default
+
+-- Efek stroke pada tombol
+local YesStroke = MakeElement("Stroke", Color3.fromRGB(90, 90, 90), 1.5) -- Sedikit lebih terang dari tombol
+YesStroke.Parent = YesButton
 
 local YesLabel = MakeElement("Label", "YES", 14)
 YesLabel.Parent = YesButton
@@ -716,6 +726,7 @@ YesLabel.Font = Enum.Font.GothamBold
 YesLabel.BackgroundTransparency = 1
 YesLabel.TextXAlignment = Enum.TextXAlignment.Center
 YesLabel.TextYAlignment = Enum.TextYAlignment.Center
+
 
 -- Tambahkan Animasi
 ConfirmFrame.BackgroundTransparency = 1
