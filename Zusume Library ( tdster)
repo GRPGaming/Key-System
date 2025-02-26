@@ -652,104 +652,107 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	AddDraggingFunctionality(DragPoint, MainWindow)
 
-	AddConnection(CloseBtn.MouseButton1Up, function()
-    
-local ConfirmFrame = MakeElement("RoundFrame", Color3.fromRGB(25, 25, 25), 0, 10)
-ConfirmFrame.Parent = Orion
-ConfirmFrame.Size = UDim2.new(0, 300, 0, 140)
-ConfirmFrame.Position = UDim2.new(0.5, -150, 0.5, -70)
-ConfirmFrame.BackgroundTransparency = 0
-ConfirmFrame.ClipsDescendants = true
+	local ConfirmFrame -- Variabel untuk menyimpan GUI konfirmasi
 
--- Tambahkan Stroke
-local Stroke = MakeElement("Stroke", Color3.fromRGB(93, 93, 93), 1.2)
-Stroke.Parent = ConfirmFrame
+AddConnection(CloseBtn.MouseButton1Up, function()
+    -- Cek apakah sudah ada ConfirmFrame, jika ya, jangan buat lagi
+    if ConfirmFrame and ConfirmFrame.Parent then
+        return
+    end
 
--- Tambahkan Label Teks di Tengah
-local TextLabel = MakeElement("Label", "Are you sure want to close this GUI?", 15)
-TextLabel.Parent = ConfirmFrame
-TextLabel.Size = UDim2.new(1, -20, 0, 40) -- Tambahkan margin kecil
-TextLabel.Position = UDim2.new(0.5, 0, 0, 10) -- Posisikan lebih ke tengah
-TextLabel.AnchorPoint = Vector2.new(0.5, 0) -- Pusatkan horizontal
-TextLabel.Font = Enum.Font.GothamSemibold
-TextLabel.TextWrapped = true
-TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel.TextXAlignment = Enum.TextXAlignment.Center -- Pusatkan teks horizontal
-TextLabel.TextYAlignment = Enum.TextYAlignment.Center -- Pusatkan teks vertikal
-TextLabel.BackgroundTransparency = 1
+    -- Buat ConfirmFrame baru
+    ConfirmFrame = MakeElement("RoundFrame", Color3.fromRGB(25, 25, 25), 0, 10)
+    ConfirmFrame.Parent = Orion
+    ConfirmFrame.Size = UDim2.new(0, 300, 0, 140)
+    ConfirmFrame.Position = UDim2.new(0.5, -150, 0.5, -70)
+    ConfirmFrame.BackgroundTransparency = 1
+    ConfirmFrame.ClipsDescendants = true
 
--- Tambahkan Frame untuk Tombol
-local ButtonFrame = MakeElement("Frame")
-ButtonFrame.Parent = ConfirmFrame
-ButtonFrame.Size = UDim2.new(1, 0, 0, 50)
-ButtonFrame.Position = UDim2.new(0, 0, 1, -55) -- Naikkan sedikit agar tidak terlalu ke bawah
-ButtonFrame.BackgroundTransparency = 1
+    -- Tambahkan Stroke
+    local Stroke = MakeElement("Stroke", Color3.fromRGB(93, 93, 93), 1.2)
+    Stroke.Parent = ConfirmFrame
 
--- Tombol NO
-local NoButton = MakeElement("Button")
-NoButton.Parent = ButtonFrame
-NoButton.Size = UDim2.new(0.45, -5, 0.8, 0) -- Perbesar tombol agar lebih terlihat
-NoButton.Position = UDim2.new(0, 10, 0, 5) -- Beri padding kiri
-NoButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Warna abu-abu tua
-NoButton.BorderSizePixel = 0 -- Hilangkan border default
+    -- Tambahkan Label Teks di Tengah
+    local TextLabel = MakeElement("Label", "Are you sure want to close this GUI?", 15)
+    TextLabel.Parent = ConfirmFrame
+    TextLabel.Size = UDim2.new(1, -20, 0, 40) -- Tambahkan margin kecil
+    TextLabel.Position = UDim2.new(0.5, 0, 0, 10) -- Posisikan lebih ke tengah
+    TextLabel.AnchorPoint = Vector2.new(0.5, 0) -- Pusatkan horizontal
+    TextLabel.Font = Enum.Font.GothamSemibold
+    TextLabel.TextWrapped = true
+    TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.TextXAlignment = Enum.TextXAlignment.Center -- Pusatkan teks horizontal
+    TextLabel.TextYAlignment = Enum.TextYAlignment.Center -- Pusatkan teks vertikal
+    TextLabel.BackgroundTransparency = 1
 
--- Efek stroke pada tombol
-local NoStroke = MakeElement("Stroke", Color3.fromRGB(90, 90, 90), 1.5) -- Sedikit lebih terang dari tombol
-NoStroke.Parent = NoButton
+    -- Tambahkan Frame untuk Tombol
+    local ButtonFrame = MakeElement("Frame")
+    ButtonFrame.Parent = ConfirmFrame
+    ButtonFrame.Size = UDim2.new(1, 0, 0, 50)
+    ButtonFrame.Position = UDim2.new(0, 0, 1, -55) -- Naikkan sedikit agar tidak terlalu ke bawah
+    ButtonFrame.BackgroundTransparency = 1
 
-local NoLabel = MakeElement("Label", "NO", 14)
-NoLabel.Parent = NoButton
-NoLabel.Size = UDim2.new(1, 0, 1, 0) -- Sesuaikan ukuran label
-NoLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
-NoLabel.Font = Enum.Font.GothamBold
-NoLabel.BackgroundTransparency = 1
-NoLabel.TextXAlignment = Enum.TextXAlignment.Center
-NoLabel.TextYAlignment = Enum.TextYAlignment.Center
+    -- Fungsi untuk membuat tombol
+    local function CreateButton(text, color, strokeColor, pos, callback)
+        local Button = MakeElement("Button")
+        Button.Parent = ButtonFrame
+        Button.Size = UDim2.new(0.45, -5, 0.8, 0) -- Perbesar tombol agar lebih terlihat
+        Button.Position = pos
+        Button.BackgroundColor3 = color
+        Button.BorderSizePixel = 0 -- Hilangkan border default
 
--- Tombol YES
-local YesButton = MakeElement("Button")
-YesButton.Parent = ButtonFrame
-YesButton.Size = UDim2.new(0.45, -5, 0.8, 0) -- Perbesar tombol agar lebih terlihat
-YesButton.Position = UDim2.new(0.55, 0, 0, 5) -- Beri padding kanan
-YesButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Warna abu-abu tua
-YesButton.BorderSizePixel = 0 -- Hilangkan border default
+        -- Efek stroke pada tombol
+        local Stroke = MakeElement("Stroke", strokeColor, 1.5)
+        Stroke.Parent = Button
 
--- Efek stroke pada tombol
-local YesStroke = MakeElement("Stroke", Color3.fromRGB(90, 90, 90), 1.5) -- Sedikit lebih terang dari tombol
-YesStroke.Parent = YesButton
+        -- Tambahkan label
+        local Label = MakeElement("Label", text, 14)
+        Label.Parent = Button
+        Label.Size = UDim2.new(1, 0, 1, 0) -- Sesuaikan ukuran label
+        Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Label.Font = Enum.Font.GothamBold
+        Label.BackgroundTransparency = 1
+        Label.TextXAlignment = Enum.TextXAlignment.Center
+        Label.TextYAlignment = Enum.TextYAlignment.Center
 
-local YesLabel = MakeElement("Label", "YES", 14)
-YesLabel.Parent = YesButton
-YesLabel.Size = UDim2.new(1, 0, 1, 0) -- Sesuaikan ukuran label
-YesLabel.TextColor3 = Color3.fromRGB(85, 255, 127)
-YesLabel.Font = Enum.Font.GothamBold
-YesLabel.BackgroundTransparency = 1
-YesLabel.TextXAlignment = Enum.TextXAlignment.Center
-YesLabel.TextYAlignment = Enum.TextYAlignment.Center
+        -- Animasi hover
+        Button.MouseEnter:Connect(function()
+            TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}):Play()
+        end)
+        Button.MouseLeave:Connect(function()
+            TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = color}):Play()
+        end)
 
+        -- Tambahkan event klik
+        Button.MouseButton1Click:Connect(function()
+            TweenService:Create(ConfirmFrame, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+            wait(0.2) -- Tunggu animasi selesai
+            ConfirmFrame:Destroy()
+            ConfirmFrame = nil -- Reset variabel agar bisa dibuka lagi
+            callback()
+        end)
 
--- Tambahkan Animasi
-ConfirmFrame.BackgroundTransparency = 1
-TweenService:Create(ConfirmFrame, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
+        return Button
+    end
 
--- Handle Tombol
-NoButton.MouseButton1Click:Connect(function()
-    ConfirmFrame:Destroy()
+    -- Buat Tombol NO
+    CreateButton("NO", Color3.fromRGB(60, 60, 60), Color3.fromRGB(90, 90, 90), UDim2.new(0, 10, 0, 5), function() end)
+
+    -- Buat Tombol YES
+    CreateButton("YES", Color3.fromRGB(60, 60, 60), Color3.fromRGB(90, 90, 90), UDim2.new(0.55, 0, 0, 5), function()
+        MainWindow.Visible = false
+        UIHidden = true
+        OrionLib:MakeNotification({
+            Name = "Interface Hidden",
+            Content = "Tap RightShift to reopen the interface",
+            Time = 5
+        })
+    end)
+
+    -- Tambahkan Animasi Muncul
+    TweenService:Create(ConfirmFrame, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
 end)
 
-YesButton.MouseButton1Click:Connect(function()
-    ConfirmFrame:Destroy()
-    MainWindow.Visible = false
-    UIHidden = true
-    OrionLib:MakeNotification({
-        Name = "Interface Hidden",
-        Content = "Tap RightShift to reopen the interface",
-        Time = 5
-    })
-end)
-
-
-end)
 
 
 
