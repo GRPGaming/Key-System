@@ -653,88 +653,135 @@ function OrionLib:MakeWindow(WindowConfig)
 	AddDraggingFunctionality(DragPoint, MainWindow)
 
 	AddConnection(CloseBtn.MouseButton1Up, function()
-		-- Tambahkan ini di bagian atas file dengan bagian service lainnya
-local TextService = game:GetService("TextService")
+    local ConfirmFrame = AddThemeObject(
+        SetChildren(
+            SetProps(
+                MakeElement("RoundFrame", Color3.fromRGB(25, 25, 25), 0, 10),
+                {
+                    Parent = Orion,
+                    Size = UDim2.new(0, 300, 0, 140),
+                    Position = UDim2.new(0.5, -150, 0.5, -70),
+                    BackgroundTransparency = 0,
+                    ClipsDescendants = true
+                }
+            ),
+            {
+                MakeElement("Stroke", Color3.fromRGB(93, 93, 93), 1.2),
+                MakeElement("Padding", 15, 15, 15, 15),
+                AddThemeObject(
+                    SetProps(
+                        MakeElement("Label", "Are you sure want to close this GUI?", 15),
+                        {
+                            Size = UDim2.new(1, 0, 0, 40),
+                            Font = Enum.Font.GothamSemibold,
+                            TextWrapped = true,
+                            TextColor3 = Color3.fromRGB(200, 200, 200)
+                        }
+                    ),
+                    "Text"
+                ),
+                SetChildren(
+                    SetProps(
+                        MakeElement("Frame"),
+                        {
+                            Size = UDim2.new(1, 0, 0, 50),
+                            Position = UDim2.new(0, 0, 1, -50),
+                            BackgroundTransparency = 1
+                        }
+                    ),
+                    {
+                        AddThemeObject(
+                            SetProps(
+                                MakeElement("Button"),
+                                {
+                                    Name = "NoButton",
+                                    Size = UDim2.new(0.5, -5, 1, 0),
+                                    Position = UDim2.new(0, 0, 0, 0),
+                                    BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+                                }
+                            ),
+                            {
+                                MakeElement("Corner", 0, 5),
+                                AddThemeObject(
+                                    SetProps(
+                                        MakeElement("Label", "NO", 14),
+                                        {
+                                            TextColor3 = Color3.fromRGB(255, 85, 85),
+                                            Font = Enum.Font.GothamBold
+                                        }
+                                    ),
+                                    "Text"
+                                ),
+                                MakeElement("Stroke", Color3.fromRGB(70, 70, 70))
+                            }
+                        ),
+                        AddThemeObject(
+                            SetProps(
+                                MakeElement("Button"),
+                                {
+                                    Name = "YesButton",
+                                    Size = UDim2.new(0.5, -5, 1, 0),
+                                    Position = UDim2.new(0.5, 5, 0, 0),
+                                    BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+                                }
+                            ),
+                            {
+                                MakeElement("Corner", 0, 5),
+                                AddThemeObject(
+                                    SetProps(
+                                        MakeElement("Label", "YES", 14),
+                                        {
+                                            TextColor3 = Color3.fromRGB(85, 255, 127),
+                                            Font = Enum.Font.GothamBold
+                                        }
+                                    ),
+                                    "Text"
+                                ),
+                                MakeElement("Stroke", Color3.fromRGB(70, 70, 70))
+                            }
+                        )
+                    }
+                )
+            }
+        )
+    )
 
--- Modifikasi fungsi CloseBtn (cari bagian ini)
-AddConnection(CloseBtn.MouseButton1Up, function()
-    -- Hapus kode lama dan ganti dengan ini:
-    local ConfirmFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(25, 25, 25), 0, 10), {
-        Parent = Orion,
-        Size = UDim2.new(0, 300, 0, 140),
-        Position = UDim2.new(0.5, -150, 0.5, -70),
-        BackgroundTransparency = 0,
-        ClipsDescendants = true
-    }, {
-        MakeElement("Stroke", Color3.fromRGB(93, 93, 93), 1.2),
-        MakeElement("Padding", 15, 15, 15, 15),
-        AddThemeObject(SetProps(MakeElement("Label", "Are you sure want to close this GUI?", 15), {
-            Size = UDim2.new(1, 0, 0, 40),
-            Font = Enum.Font.GothamSemibold,
-            TextWrapped = true,
-            TextColor3 = Color3.fromRGB(200, 200, 200)
-        }, "Text"),
-        
-        SetChildren(SetProps(MakeElement("Frame"), {
-            Size = UDim2.new(1, 0, 0, 50),
-            Position = UDim2.new(0, 0, 1, -50),
-            BackgroundTransparency = 1
-        }, {
-            AddThemeObject(SetProps(MakeElement("Button"), {
-                Size = UDim2.new(0.5, -5, 1, 0),
-                Position = UDim2.new(0, 0, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            }, {
-                MakeElement("Corner", 0, 5),
-                AddThemeObject(SetProps(MakeElement("Label", "NO", 14), {
-                    TextColor3 = Color3.fromRGB(255, 85, 85),
-                    Font = Enum.Font.GothamBold
-                }), "Text"),
-                MakeElement("Stroke", Color3.fromRGB(70, 70, 70))
-            }),
-            
-            AddThemeObject(SetProps(MakeElement("Button"), {
-                Size = UDim2.new(0.5, -5, 1, 0),
-                Position = UDim2.new(0.5, 5, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            }, {
-                MakeElement("Corner", 0, 5),
-                AddThemeObject(SetProps(MakeElement("Label", "YES", 14), {
-                    TextColor3 = Color3.fromRGB(85, 255, 127),
-                    Font = Enum.Font.GothamBold
-                }), "Text"),
-                MakeElement("Stroke", Color3.fromRGB(70, 70, 70))
-            })
-        })
-    })
-
-    -- Animasi muncul
+    -- Animasi muncul (fade in)
     ConfirmFrame.BackgroundTransparency = 1
     TweenService:Create(ConfirmFrame, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
+
+    -- Tangani klik tombol NO dan YES
+    local noButton = ConfirmFrame:FindFirstChild("NoButton", true)
+    local yesButton = ConfirmFrame:FindFirstChild("YesButton", true)
     
-    -- Handle tombol
-    ConfirmFrame:WaitForChild("Button"):WaitForChild("TextButton").MouseButton1Click:Connect(function()
-        ConfirmFrame:Destroy()
-        MainWindow.Visible = false
-        UIHidden = true
-        WindowConfig.CloseCallback()
-        OrionLib:MakeNotification({
-            Name = "Interface Hidden",
-            Content = "Tap RightShift to reopen the interface",
-            Time = 5
-        })
-    end)
+    if noButton then
+        noButton.MouseButton1Click:Connect(function()
+            ConfirmFrame:Destroy()
+        end)
+    end
     
-    ConfirmFrame:WaitForChild("Button"):FindFirstChildWhichIsA("TextButton").MouseButton1Click:Connect(function()
-        ConfirmFrame:Destroy()
-    end)
+    if yesButton then
+        yesButton.MouseButton1Click:Connect(function()
+            ConfirmFrame:Destroy()
+            MainWindow.Visible = false
+            UIHidden = true
+            WindowConfig.CloseCallback()
+            OrionLib:MakeNotification({
+                Name = "Interface Hidden",
+                Content = "Tap RightShift to reopen the interface",
+                Time = 5
+            })
+        end)
+    end
 end)
 
-	AddConnection(UserInputService.InputBegan, function(Input)
-		if Input.KeyCode == Enum.KeyCode.RightShift and UIHidden then
-			MainWindow.Visible = true
-		end
-	end)
+AddConnection(UserInputService.InputBegan, function(Input)
+    if Input.KeyCode == Enum.KeyCode.RightShift and UIHidden then
+        MainWindow.Visible = true
+    end
+end)
+
+
 
 	AddConnection(MinimizeBtn.MouseButton1Up, function()
 		if Minimized then
