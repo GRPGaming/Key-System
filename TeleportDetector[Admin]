@@ -1,0 +1,69 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Membuat GUI secara dinamis
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 175, 0, 100)
+frame.Position = UDim2.new(0.5, -87, 0.5, -50)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.Draggable = true
+frame.Active = true
+frame.Parent = screenGui
+
+local function createLabelButton(yOffset, textLabel, buttonText)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 15, 0, 15)
+    label.Position = UDim2.new(0, 5, 0, yOffset)
+    label.Text = textLabel
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.Parent = frame
+    
+    local textBox = Instance.new("TextBox")
+    textBox.Size = UDim2.new(0, 75, 0, 15)
+    textBox.Position = UDim2.new(0, 25, 0, yOffset)
+    textBox.Text = "0"
+    textBox.TextEditable = true
+    textBox.Parent = frame
+    
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 60, 0, 15)
+    button.Position = UDim2.new(0, 105, 0, yOffset)
+    button.Text = buttonText
+    button.Parent = frame
+    
+    return textBox, button
+end
+
+local xTextBox, detectButton = createLabelButton(5, "X:", "Detect")
+local yTextBox, _ = createLabelButton(25, "Y:", "")
+local zTextBox, teleportButton = createLabelButton(45, "Z:", "Teleport")
+
+-- Fungsi untuk mendeteksi lokasi pemain
+detectButton.MouseButton1Click:Connect(function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local pos = character.HumanoidRootPart.Position
+        xTextBox.Text = string.format("%.2f", pos.X)
+        yTextBox.Text = string.format("%.2f", pos.Y)
+        zTextBox.Text = string.format("%.2f", pos.Z)
+    else
+        xTextBox.Text, yTextBox.Text, zTextBox.Text = "Error", "Error", "Error"
+    end
+end)
+
+-- Fungsi untuk teleportasi ke lokasi yang diinginkan
+teleportButton.MouseButton1Click:Connect(function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local x, y, z = tonumber(xTextBox.Text), tonumber(yTextBox.Text), tonumber(zTextBox.Text)
+        if x and y and z then
+            character.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
+        else
+            xTextBox.Text, yTextBox.Text, zTextBox.Text = "Invalid", "Invalid", "Invalid"
+        end
+    end
+end)
