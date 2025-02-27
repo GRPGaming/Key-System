@@ -1,0 +1,10 @@
+local player = game:GetService("Players").LocalPlayer
+local doubleJump = player:FindFirstChild("PlayerScripts") and player.PlayerScripts:FindFirstChild("DoubleJump")
+
+if doubleJump then
+    doubleJump.Disabled = true
+    task.wait(0.1) -- Tunggu sebentar agar perubahan diterapkan
+    doubleJump.Disabled = false
+else
+    warn("DoubleJump tidak ditemukan!")
+end
