@@ -1,1 +1,2 @@
-9
+-- Key%20Test.lua
+sf_key = "0"
