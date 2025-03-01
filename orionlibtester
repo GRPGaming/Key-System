@@ -1731,7 +1731,7 @@ function OrionLib:Destroy()
 end
 
 local HttpService = game:GetService("HttpService")
-local API_URL = "https://fragrant-credit-6a87.zerostarnew.workers.dev" -- Ganti dengan API Anda
+local API_URL = "https://dawn-resonance-824f.zerostarnew.workers.dev" -- Ganti dengan API Anda
 
 -- Fungsi untuk mendapatkan jumlah pemain online dari API
 function OrionLib:GetOnlineScripters()
@@ -1759,14 +1759,6 @@ function OrionLib:UpdateOnlineStatus(status)
         self:UpdateAllLabels()
     else
         warn("Gagal memperbarui status pemain:", response)
-    end
-end
-
--- Fungsi untuk memperbarui semua label jumlah pemain
-function OrionLib:UpdateAllLabels()
-    local onlineUsers = self:GetOnlineScripters() or 0
-    for _, label in pairs(self.OnlineLabels or {}) do
-        label:Set("Current Player Online: " .. tostring(onlineUsers))
     end
 end
 
