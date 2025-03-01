@@ -1738,13 +1738,21 @@ local function getOnlineCount()
     end)
 
     if success then
-        print("Response dari Firebase:", response)
-        return tonumber(HttpService:JSONDecode(response)) or 0
+        print("Response dari API:", response) -- Debugging untuk melihat respon dari API
+        local data = HttpService:JSONDecode(response)
+        
+        if data and data.totalOnline then
+            return tonumber(data.totalOnline) or 0
+        else
+            warn("Data tidak valid:", response)
+            return 0
+        end
     else
         warn("Gagal mendapatkan jumlah pemain online:", response)
         return 0
     end
 end
+
 
 
 -- Fungsi untuk memperbarui jumlah pemain online di API Anda
