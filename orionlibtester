@@ -1730,41 +1730,43 @@ function OrionLib:Destroy()
 	Orion:Destroy()
 end
 
-local API_URL = "https://robloxscripteronline-default-rtdb.firebaseio.com/totalOnline.json"
+local HttpService = game:GetService("HttpService")
+local API_URL = "https://fragrant-credit-6a87.zerostarnew.workers.dev" -- Ganti dengan API Anda
 
-local function getOnlineCount()
+-- Fungsi untuk mendapatkan jumlah pemain online dari API
+function OrionLib:GetOnlineScripters()
     local success, response = pcall(function()
         return HttpService:GetAsync(API_URL)
     end)
 
     if success then
-        print("Response dari API:", response) -- Debugging untuk melihat respon dari API
         local data = HttpService:JSONDecode(response)
-        
-        if data and data.totalOnline then
-            return tonumber(data.totalOnline) or 0
-        else
-            warn("Data tidak valid:", response)
-            return 0
-        end
+        return tonumber(data.totalOnline) or 0
     else
         warn("Gagal mendapatkan jumlah pemain online:", response)
         return 0
     end
 end
 
-
-
--- Fungsi untuk memperbarui jumlah pemain online di API Anda
-local function updateOnlineCount(action)
+-- Fungsi untuk memperbarui status online pemain
+function OrionLib:UpdateOnlineStatus(status)
     local success, response = pcall(function()
-        return HttpService:PostAsync(API_URL, HttpService:JSONEncode({ action = action }), Enum.HttpContentType.ApplicationJson)
+        return HttpService:PostAsync(API_URL, HttpService:JSONEncode({ action = status }), Enum.HttpContentType.ApplicationJson)
     end)
 
     if success then
-        print("API Update Success:", action)
+        print("Berhasil memperbarui status pemain:", status)
+        self:UpdateAllLabels()
     else
-        warn("Gagal memperbarui jumlah pemain online:", response)
+        warn("Gagal memperbarui status pemain:", response)
+    end
+end
+
+-- Fungsi untuk memperbarui semua label jumlah pemain
+function OrionLib:UpdateAllLabels()
+    local onlineUsers = self:GetOnlineScripters() or 0
+    for _, label in pairs(self.OnlineLabels or {}) do
+        label:Set("Current Player Online: " .. tostring(onlineUsers))
     end
 end
 
