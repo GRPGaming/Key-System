@@ -1731,7 +1731,7 @@ function OrionLib:Destroy()
 end
 
 local HttpService = game:GetService("HttpService")
-local API_URL = "https://polished-snowflake-5a0d.zerostarnew.workers.dev/" -- PASTIKAN DIUBAH KE URL API ANDA!
+local API_URL = "https://polished-snowflake-5a0d.zerostarnew.workers.dev" -- PASTIKAN DIUBAH KE URL API ANDA!
 
 function OrionLib:GetOnlineScripters()
     local success, response = pcall(function()
