@@ -1730,62 +1730,35 @@ function OrionLib:Destroy()
 	Orion:Destroy()
 end
 
+local API_URL = "https://robloxscripteronline-default-rtdb.firebaseio.com/totalOnline.json"
 local HttpService = game:GetService("HttpService")
 
-function OrionLib:MonitorPlayers()
-    -- Event saat pemain masuk
-    game.Players.PlayerAdded:Connect(function(player)
-        OrionLib:UpdateOnlineStatus("connect")
-        print("[Monitor] " .. player.Name .. " telah terhubung.")
-    end)
-
-    -- Event saat pemain keluar
-    game.Players.PlayerRemoving:Connect(function(player)
-        OrionLib:UpdateOnlineStatus("disconnect")
-        print("[Monitor] " .. player.Name .. " telah keluar.")
-    end)
-end
-
--- Panggil fungsi pemantauan saat library dimulai
-OrionLib:MonitorPlayers()
-
--- Ganti dengan URL API dari Cloudflare Workers
-local API_URL = "https://noisy-art-4c19.zerostarnew.workers.dev/"
-
-function OrionLib:GetOnlineScripters()
+-- Fungsi untuk mendapatkan jumlah pemain online dari Firebase
+local function getOnlineCount()
     local success, response = pcall(function()
         return HttpService:GetAsync(API_URL)
     end)
 
     if success then
         local data = HttpService:JSONDecode(response)
-        return data.totalOnline or 0
+        return data or 0
     else
-        warn("Gagal mengambil total scripter online!")
+        warn("Gagal mendapatkan jumlah pemain online.")
         return 0
     end
 end
 
-function OrionLib:UpdateOnlineStatus(action)
-    local currentTotal = OrionLib:GetOnlineScripters()
-
-    if action == "connect" then
-        currentTotal = currentTotal + 1
-    elseif action == "disconnect" then
-        currentTotal = math.max(currentTotal - 1, 0)
-    end
-
-    local dataToSend = HttpService:JSONEncode({ totalOnline = currentTotal })
-
-    local successPost, responsePost = pcall(function()
-        return HttpService:PostAsync(API_URL, dataToSend, Enum.HttpContentType.ApplicationJson)
+-- Fungsi untuk memperbarui jumlah pemain online di Firebase
+local function updateOnlineCount(newCount)
+    local success, response = pcall(function()
+        return HttpService:PutAsync(API_URL, HttpService:JSONEncode(newCount), Enum.HttpContentType.ApplicationJson)
     end)
 
-    if successPost then
-        print("Sukses memperbarui status online: " .. currentTotal)
-    else
-        warn("Gagal memperbarui status online:", responsePost)
+    if not success then
+        warn("Gagal memperbarui jumlah pemain online.")
     end
 end
+
+
 
 return OrionLib
