@@ -1730,44 +1730,6 @@ function OrionLib:Destroy()
 	Orion:Destroy()
 end
 
--- ORIONLIB EXTENSIONS
-local HttpService = game:GetService("HttpService")
-local API_URL = https://square-meadow-33c8.zerostarnew.workers.dev/" -- Ganti dengan API URLmu!
-
-function OrionLib:GetOnlineScripters()
-    local response = HttpService:GetAsync(API_URL, true)
-    return tonumber(HttpService:JSONDecode(response).totalOnline or 0
-end
-
-function OrionLib:UpdateOnlineStatus(action)
-    local timestamp = os.time()
-    local playerId = game.Players.LocalPlayer.UserId
-    
-    local success, response = pcall(function()
-        return HttpService:PostAsync(
-            API_URL,
-            HttpService:JSONEncode({
-                action = action,
-                userId = playerId,
-                timestamp = timestamp
-            }),
-            Enum.HttpContentType.ApplicationJson
-        )
-    end)
-    
-    if not success then
-        warn("API Error:", response)
-        return false
-    end
-    return true
-end
-
-function OrionLib:UpdateAllLabels()
-    local onlineUsers = self:GetOnlineScripters()
-    for _, label in pairs(self.OnlineLabels or {}) do
-        label:Set(("Online Scripters: %d"):format(onlineUsers))
-    end
-end
 
 
 
