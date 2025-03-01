@@ -1731,37 +1731,26 @@ function OrionLib:Destroy()
 end
 
 local HttpService = game:GetService("HttpService")
-local API_URL = "https://dawn-resonance-824f.zerostarnew.workers.dev" -- Ganti dengan API Anda
+local API_URL = "https://polished-snowflake-5a0d.zerostarnew.workers.dev/" -- PASTIKAN DIUBAH KE URL API ANDA!
 
--- Fungsi untuk mendapatkan jumlah pemain online dari API
 function OrionLib:GetOnlineScripters()
     local success, response = pcall(function()
         return HttpService:GetAsync(API_URL)
     end)
-
-    if success then
-        local data = HttpService:JSONDecode(response)
-        return tonumber(data.totalOnline) or 0
-    else
-        warn("Gagal mendapatkan jumlah pemain online:", response)
-        return 0
-    end
+    
+    return success and tonumber(HttpService:JSONDecode(response).totalOnline) or 0
 end
 
--- Fungsi untuk memperbarui status online pemain
 function OrionLib:UpdateOnlineStatus(status)
-    local success, response = pcall(function()
-        return HttpService:PostAsync(API_URL, HttpService:JSONEncode({ action = status }), Enum.HttpContentType.ApplicationJson)
-    end)
-
-    if success then
-        print("Berhasil memperbarui status pemain:", status)
+    pcall(function()
+        HttpService:PostAsync(
+            API_URL,
+            HttpService:JSONEncode({action = status}),
+            Enum.HttpContentType.ApplicationJson
+        )
         self:UpdateAllLabels()
-    else
-        warn("Gagal memperbarui status pemain:", response)
-    end
+    end)
 end
-
 
 
 
