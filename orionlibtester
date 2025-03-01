@@ -1730,7 +1730,71 @@ function OrionLib:Destroy()
 	Orion:Destroy()
 end
 
+-- Konfigurasi API
+local API_URL = "https://nameless-math-60d1.zerostarnew.workers.dev"  -- Ganti dengan URL Worker Anda
+local HeartbeatInterval = 20  -- Interval heartbeat (dalam detik)
+local PlayerId = tostring(game.Players.LocalPlayer.UserId)  -- UserId sebagai string
 
+-- Fungsi untuk update jumlah pemain online
+function OrionLib:UpdateOnlineCount()
+    local success, response = pcall(function()
+        return game:HttpGet(API_URL)
+    end)
 
+    if success then
+        local data = game:GetService("HttpService"):JSONDecode(response)
+        return tonumber(data.totalOnline) or 0
+    else
+        warn("Failed to fetch online count:", response)
+        return 0
+    end
+end
+
+-- Fungsi untuk update status pemain
+function OrionLib:UpdatePlayerStatus(action)
+    local success, response = pcall(function()
+        return game:HttpGet(API_URL, {
+            method = "POST",
+            headers = {
+                ["Content-Type"] = "application/json"
+            },
+            body = game:GetService("HttpService"):JSONEncode({
+                userId = PlayerId,
+                action = action
+            })
+        })
+    end)
+
+    if not success then
+        warn("Failed to update player status:", response)
+    end
+end
+
+-- Fungsi untuk inisialisasi sistem online
+function OrionLib:InitOnlineSystem()
+    -- Update status saat script dimulai
+    self:UpdatePlayerStatus("connect")
+
+    -- Auto-update jumlah pemain online setiap 10 detik
+    task.spawn(function()
+        while task.wait(10) do
+            self:UpdateOnlineCount()
+        end
+    end)
+
+    -- Update status saat player keluar
+    game.Players.PlayerRemoving:Connect(function(player)
+        if player == game.Players.LocalPlayer then
+            self:UpdatePlayerStatus("disconnect")
+        end
+    end)
+
+    -- Heartbeat untuk menjaga status aktif
+    task.spawn(function()
+        while task.wait(HeartbeatInterval) do
+            self:UpdatePlayerStatus("connect")
+        end
+    end)
+end
 
 return OrionLib
