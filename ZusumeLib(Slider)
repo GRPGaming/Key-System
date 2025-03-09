@@ -393,6 +393,20 @@ local NotificationHolder = SetProps(SetChildren(MakeElement("TFrame"), {
 	Parent = Orion
 })
 
+function OrionLib:ResetAll()
+    for flagName, flagObject in pairs(self.Flags) do
+        if flagObject.Type == "Toggle" then
+            flagObject:Set(false)
+        elseif flagObject.Type == "Slider" then
+            flagObject:Set(flagObject.Default or flagObject.Min)
+        elseif flagObject.Type == "Dropdown" then
+            flagObject:Set(flagObject.Default or "...")
+        elseif flagObject.Type == "Colorpicker" then
+            flagObject:Set(flagObject.Default or Color3.new(1,1,1))
+        end
+    end
+end
+
 function OrionLib:MakeNotification(NotificationConfig)
 	spawn(function()
 		NotificationConfig.Name = NotificationConfig.Name or "Notification"
@@ -453,6 +467,8 @@ function OrionLib:MakeNotification(NotificationConfig)
 		NotificationFrame:Destroy()
 	end)
 end    
+
+
 
 function OrionLib:Init()
 	if OrionLib.SaveCfg then	
@@ -742,10 +758,11 @@ AddConnection(CloseBtn.MouseButton1Up, function()
     CreateButton("YES", Color3.fromRGB(60, 60, 60), Color3.fromRGB(90, 90, 90), UDim2.new(0.55, 0, 0, 5), function()
         MainWindow.Visible = false
         UIHidden = true
+        OrionLib:ResetAll()
         OrionLib:MakeNotification({
-            Name = "Interface Hidden",
-            Content = "Tap RightShift to reopen the interface",
-            Time = 5
+            Name = "Main GUI Hidden",
+            Content = "Right Shift to Visible it",
+            Time = 3
         })
     end)
 
@@ -1010,8 +1027,14 @@ end)
 				ToggleConfig.Color = ToggleConfig.Color or Color3.fromRGB(9, 99, 195)
 				ToggleConfig.Flag = ToggleConfig.Flag or nil
 				ToggleConfig.Save = ToggleConfig.Save or false
+				ToggleConfig.Default = ToggleConfig.Default or false
 
-				local Toggle = {Value = ToggleConfig.Default, Save = ToggleConfig.Save}
+				local Toggle = {
+        Value = ToggleConfig.Default, 
+        Default = ToggleConfig.Default, -- Simpan nilai default
+        Type = "Toggle",
+        Save = ToggleConfig.Save
+    }
 
 				local Click = SetProps(MakeElement("Button"), {
 					Size = UDim2.new(1, 0, 1, 0)
@@ -1096,9 +1119,16 @@ end)
 				SliderConfig.Color = SliderConfig.Color or Color3.fromRGB(9, 149, 98)
 				SliderConfig.Flag = SliderConfig.Flag or nil
 				SliderConfig.Save = SliderConfig.Save or false
-
-				local Slider = {Value = SliderConfig.Default, Save = SliderConfig.Save}
-				local Dragging = false
+SliderConfig.Default = SliderConfig.Default or SliderConfig.Min -- Tambahkan ini
+    
+local Slider = {
+        Value = SliderConfig.Default,
+        Default = SliderConfig.Default, -- Simpan nilai default
+        Type = "Slider",
+        Save = SliderConfig.Save
+    }
+    
+local Dragging = false
 
 				local SliderDrag = SetChildren(SetProps(MakeElement("RoundFrame", SliderConfig.Color, 0, 5), {
 					Size = UDim2.new(0, 0, 1, 0),
