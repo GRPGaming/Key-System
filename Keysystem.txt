@@ -1,2 +1,2 @@
-sf_key = "0"  -- Key untuk Verification
-early_access_key = "OMG"  -- Key untuk Early Access
+sf_key = "v3"  -- Key untuk Verification
+early_access_key = "-"  -- Key untuk Early Access
