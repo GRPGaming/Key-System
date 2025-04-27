@@ -660,6 +660,7 @@ function OrionLib:MakeWindow(WindowConfig)
 				SliderConfig.Increment=SliderConfig.Increment or 1
 				SliderConfig.Default=SliderConfig.Default or 50
 				SliderConfig.Callback=SliderConfig.Callback or function() end
+				SliderConfig.Color=SliderConfig.Color or Color3.fromRGB(9,99,195)
 				SliderConfig.Flag=SliderConfig.Flag or nil
 				SliderConfig.Save=SliderConfig.Save or false
 
@@ -668,55 +669,56 @@ function OrionLib:MakeWindow(WindowConfig)
 
 				local SliderFrame=AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame",Color3.fromRGB(255,255,255),0,5),{Size=UDim2.new(1,0,0,40),Parent=ItemParent}),{
 					AddThemeObject(SetProps(MakeElement("Label",SliderConfig.Name,14),{Size=UDim2.new(1,-10,0,16),Position=UDim2.new(0,10,0,2),Font=Enum.Font.GothamBold,Name="Content"}),"Text"),
-					AddThemeObject(SetProps(MakeElement("Label","0",14),{Size=UDim2.new(0,30,0,16),Position=UDim2.new(1,-40,0,2),Font=Enum.Font.GothamSemibold,Name="Value"}),"Text"),
+					AddThemeObject(SetProps(MakeElement("Label",tostring(SliderConfig.Default),14),{Size=UDim2.new(0,30,0,16),Position=UDim2.new(1,-40,0,2),Font=Enum.Font.GothamSemibold,Name="Value"}),"Text"),
 					AddThemeObject(MakeElement("Stroke"),"Stroke"),
-					SetProps(MakeElement("Frame"),{Size=UDim2.new(1,-20,0,8),Position=UDim2.new(0,10,1,-12),Name="SliderBar",BackgroundTransparency=1}),
+					SetProps(MakeElement("Frame"),{Size=UDim2.new(1,-20,0,8),Position=UDim2.new(0,10,1,-12),Name="SliderBar",BackgroundTransparency=1})
 				}),"Second")
 
 				local SliderBar=SliderFrame.SliderBar
-				local SliderInner=AddThemeObject(SetProps(MakeElement("Frame"),{Size=UDim2.new(0,0,1,0),BackgroundColor3=SliderConfig.Color or Color3.fromRGB(9,99,195),Name="Inner"}),"Divider")
+				local SliderInner=AddThemeObject(SetProps(MakeElement("Frame"),{Size=UDim2.new(0,0,1,0),BackgroundColor3=SliderConfig.Color,Name="Inner"}),"Divider")
 				SliderInner.Parent=SliderBar
-				local SliderGrab=AddThemeObject(SetProps(MakeElement("Frame"),{Size=UDim2.new(0,10,0,14),Position=UDim2.new(0,0,0,-3),AnchorPoint=Vector2.new(0.5,0),BackgroundColor3=SliderConfig.Color or Color3.fromRGB(9,99,195),Name="Grab"}),"Divider")
+				local SliderGrab=AddThemeObject(SetProps(MakeElement("Frame"),{Size=UDim2.new(0,10,0,14),Position=UDim2.new(0,0,0,-3),AnchorPoint=Vector2.new(0.5,0),BackgroundColor3=SliderConfig.Color,Name="Grab"}),"Divider")
 				SliderGrab.Parent=SliderInner
 				MakeElement("Corner",0,2).Parent=SliderInner
 				MakeElement("Corner",0,2).Parent=SliderGrab
 
 				local Click=SetProps(MakeElement("Button"),{Size=UDim2.new(1,0,1,0),Parent=SliderBar})
 
-				local function UpdateSlider()
-					local Percentage=(Slider.Value-SliderConfig.Min)/(SliderConfig.Max-SliderConfig.Min)
-					SliderInner.Size=UDim2.new(Percentage,0,1,0)
-					SliderFrame.Value.Text=tostring(Slider.Value)
-					SliderConfig.Callback(Slider.Value)
+				local function UpdateSlider(Value)
+					Value=math.clamp(Round(Value,SliderConfig.Increment),SliderConfig.Min,SliderConfig.Max)
+					Slider.Value=Value
+					local Percentage=(Value-SliderConfig.Min)/(SliderConfig.Max-SliderConfig.Min)
+					TweenService:Create(SliderInner,TweenInfo.new(0.2,Enum.EasingStyle.Quint),{Size=UDim2.new(Percentage,0,1,0)}):Play()
+					SliderFrame.Value.Text=tostring(Value)
+					SliderConfig.Callback(Value)
 				end
 
 				function Slider:Set(Value)
-					Value=math.clamp(Round(Value,SliderConfig.Increment),SliderConfig.Min,SliderConfig.Max)
-					Slider.Value=Value
-					UpdateSlider()
+					UpdateSlider(Value)
 				end
 
 				Slider:Set(Slider.Value)
 
 				AddConnection(Click.InputBegan,function(Input)
-					if Input.UserInputType==Enum.UserInputType.MouseButton1 then
+					if Input.UserInputType==Enum.UserInputType.MouseButton1 or Input.UserInputType==Enum.UserInputType.Touch then
 						Dragging=true
 					end
 				end)
 
 				AddConnection(Click.InputEnded,function(Input)
-					if Input.UserInputType==Enum.UserInputType.MouseButton1 then
+					if Input.UserInputType==Enum.UserInputType.MouseButton1 or Input.UserInputType==Enum.UserInputType.Touch then
 						Dragging=false
+						if SliderConfig.Save then SaveCfg(game.GameId) end
 					end
 				end)
 
 				AddConnection(UserInputService.InputChanged,function(Input)
-					if Dragging and Input.UserInputType==Enum.UserInputType.MouseMovement then
+					if Dragging and (Input.UserInputType==Enum.UserInputType.MouseMovement or Input.UserInputType==Enum.UserInputType.Touch) then
 						local MousePos=UserInputService:GetMouseLocation()
 						local RelativePos=MousePos-SliderBar.AbsolutePosition
 						local Percentage=math.clamp(RelativePos.X/SliderBar.AbsoluteSize.X,0,1)
-						Slider:Set(SliderConfig.Min+(SliderConfig.Max-SliderConfig.Min)*Percentage)
-						SaveCfg(game.GameId)
+						local Value=SliderConfig.Min+(SliderConfig.Max-SliderConfig.Min)*Percentage
+						UpdateSlider(Value)
 					end
 				end)
 
@@ -728,7 +730,7 @@ function OrionLib:MakeWindow(WindowConfig)
 				DropdownConfig=DropdownConfig or {}
 				DropdownConfig.Name=DropdownConfig.Name or "Dropdown"
 				DropdownConfig.Options=DropdownConfig.Options or {}
-				DropdownConfig.Default=DropdownConfig.Default or "..."
+				DropdownConfig.Default=DropdownConfig.Default or (DropdownConfig.Options[1] or "...")
 				DropdownConfig.Callback=DropdownConfig.Callback or function() end
 				DropdownConfig.Flag=DropdownConfig.Flag or nil
 				DropdownConfig.Save=DropdownConfig.Save or false
@@ -738,8 +740,8 @@ function OrionLib:MakeWindow(WindowConfig)
 
 				local DropdownFrame=AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame",Color3.fromRGB(255,255,255),0,5),{Size=UDim2.new(1,0,0,25),Parent=ItemParent}),{
 					AddThemeObject(SetProps(MakeElement("Label",DropdownConfig.Name,14),{Size=UDim2.new(1,-10,1,0),Position=UDim2.new(0,10,0,0),Font=Enum.Font.GothamBold,Name="Content"}),"Text"),
-					AddThemeObject(SetProps(MakeElement("Label","...",14),{Size=UDim2.new(0,60,1,0),Position=UDim2.new(1,-70,0,0),Font=Enum.Font.GothamSemibold,Name="Value",TextXAlignment=Enum.TextXAlignment.Right}),"Text"),
-					AddThemeObject(SetProps(MakeElement("Image","rbxassetid://7072706620"),{Size=UDim2.new(0,14,0,14),Position=UDim2.new(1,-20,0,5)}),"TextDark"),
+					AddThemeObject(SetProps(MakeElement("Label",DropdownConfig.Default,14),{Size=UDim2.new(0,60,1,0),Position=UDim2.new(1,-70,0,0),Font=Enum.Font.GothamSemibold,Name="Value",TextXAlignment=Enum.TextXAlignment.Right}),"Text"),
+					AddThemeObject(SetProps(MakeElement("Image","rbxassetid://7072706620"),{Size=UDim2.new(0,14,0,14),Position=UDim2.new(1,-20,0,5),Name="Arrow"}),"TextDark"),
 					AddThemeObject(MakeElement("Stroke"),"Stroke"),
 					SetProps(MakeElement("Button"),{Size=UDim2.new(1,0,1,0),Name="DropBtn"})
 				}),"Second")
@@ -754,45 +756,52 @@ function OrionLib:MakeWindow(WindowConfig)
 					for _,Child in pairs(DropList:GetChildren()) do
 						if Child:IsA("TextButton") then Child:Destroy() end
 					end
-					for _,Option in pairs(Dropdown.Options) do
+					local ListHeight=0
+					for _,Option in ipairs(Dropdown.Options) do
 						local OptionBtn=AddThemeObject(SetChildren(SetProps(MakeElement("Button"),{Size=UDim2.new(1,0,0,20),BackgroundColor3=OrionLib.Themes[OrionLib.SelectedTheme].Second}),{
-							AddThemeObject(SetProps(MakeElement("Label",Option,14),{Size=UDim2.new(1,-10,1,0),Position=UDim2.new(0,5,0,0),Font=Enum.Font.GothamSemibold,TextXAlignment=Enum.TextXAlignment.Left}),"Text")
+							AddThemeObject(SetProps(MakeElement("Label",tostring(Option),14),{Size=UDim2.new(1,-10,1,0),Position=UDim2.new(0,5,0,0),Font=Enum.Font.GothamSemibold,TextXAlignment=Enum.TextXAlignment.Left}),"Text")
 						}),"Second")
 						OptionBtn.Parent=DropList
+						ListHeight=ListHeight+22 -- 20 height + 2 padding
 
-						AddConnection(OptionBtn.MouseButton1Click,function()
-							Dropdown:Set(Option)
-							SaveCfg(game.GameId)
-							IsDropped=false
-							DropList.Visible=false
-							DropdownFrame.DropBtn.ImageLabel.Image="rbxassetid://7072706620"
-							DropList.Size=UDim2.new(1,0,0,0)
+						AddConnection(OptionBtn.InputBegan,function(Input)
+							if Input.UserInputType==Enum.UserInputType.MouseButton1 or Input.UserInputType==Enum.UserInputType.Touch then
+								Dropdown:Set(Option)
+								IsDropped=false
+								DropList.Visible=false
+								DropdownFrame.Arrow.Image="rbxassetid://7072706620"
+								TweenService:Create(DropList,TweenInfo.new(0.2,Enum.EasingStyle.Quint),{Size=UDim2.new(1,0,0,0)}):Play()
+								if DropdownConfig.Save then SaveCfg(game.GameId) end
+							end
 						end)
 					end
-					DropList.CanvasSize=UDim2.new(0,0,0,DropList.UIListLayout.AbsoluteContentSize.Y+4)
-					if IsDropped then
-						DropList.Size=UDim2.new(1,0,0,math.min(DropList.UIListLayout.AbsoluteContentSize.Y+4,80))
-					end
+					DropList.CanvasSize=UDim2.new(0,0,0,ListHeight)
 				end
 
 				function Dropdown:Set(Value)
-					Dropdown.Value=Value
-					DropdownFrame.Value.Text=Value
-					DropdownConfig.Callback(Value)
+					if table.find(Dropdown.Options,Value) then
+						Dropdown.Value=Value
+						DropdownFrame.Value.Text=tostring(Value)
+						DropdownConfig.Callback(Value)
+					end
 				end
 
 				function Dropdown:Refresh(NewOptions)
-					Dropdown.Options=NewOptions
+					Dropdown.Options=NewOptions or {}
 					Dropdown.Value=Dropdown.Options[1] or "..."
-					DropdownFrame.Value.Text=Dropdown.Value
+					Dropdown.Default=Dropdown.Value
+					DropdownFrame.Value.Text=tostring(Dropdown.Value)
 					UpdateDropList()
 				end
 
-				AddConnection(DropdownFrame.DropBtn.MouseButton1Click,function()
-					IsDropped=not IsDropped
-					DropList.Visible=IsDropped
-					DropdownFrame.DropBtn.ImageLabel.Image=IsDropped and "rbxassetid://7072706743" or "rbxassetid://7072706620"
-					DropList.Size=IsDropped and UDim2.new(1,0,0,math.min(DropList.UIListLayout.AbsoluteContentSize.Y+4,80)) or UDim2.new(1,0,0,0)
+				AddConnection(DropdownFrame.DropBtn.InputBegan,function(Input)
+					if Input.UserInputType==Enum.UserInputType.MouseButton1 or Input.UserInputType==Enum.UserInputType.Touch then
+						IsDropped=not IsDropped
+						DropList.Visible=IsDropped
+						DropdownFrame.Arrow.Image=IsDropped and "rbxassetid://7072706743" or "rbxassetid://7072706620"
+						local TargetSize=IsDropped and UDim2.new(1,0,0,math.min(DropList.CanvasSize.Y.Offset,80)) or UDim2.new(1,0,0,0)
+						TweenService:Create(DropList,TweenInfo.new(0.2,Enum.EasingStyle.Quint),{Size=TargetSize}):Play()
+					end
 				end)
 
 				Dropdown:Refresh(DropdownConfig.Options)
