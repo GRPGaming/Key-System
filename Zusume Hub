@@ -322,12 +322,12 @@ function OrionLib:MakeWindow(WindowConfig)
 	end
 
 	local TabHolder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4), {Size = UDim2.new(1, 0, 1, -40)}), {
-		MakeElement("List"),
-		MakeElement("Padding", 8, 0, 0, 8)
+		MakeElement("List", 0, 2),
+		MakeElement("Padding", 4, 0, 0, 4)
 	}), "Divider")
 
 	AddConnection(TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-		TabHolder.CanvasSize = UDim2.new(0, 0, 0, TabHolder.UIListLayout.AbsoluteContentSize.Y + 16)
+		TabHolder.CanvasSize = UDim2.new(0, 0, 0, TabHolder.UIListLayout.AbsoluteContentSize.Y + 8)
 	end)
 
 	local CloseBtn = SetChildren(SetProps(MakeElement("Button"), {Size = UDim2.new(0.5, 0, 1, 0), Position = UDim2.new(0.5, 0, 0, 0), BackgroundTransparency = 1}), {
@@ -340,7 +340,7 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	local DragPoint = SetProps(MakeElement("TFrame"), {Size = UDim2.new(1, 0, 0, 40)})
 
-	local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {Size = UDim2.new(0, 120, 1, -40), Position = UDim2.new(0, 0, 0, 40)}), {
+	local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {Size = UDim2.new(0, 80, 1, -40), Position = UDim2.new(0, 0, 0, 40)}), {
 		AddThemeObject(SetProps(MakeElement("Frame"), {Size = UDim2.new(1, 0, 0, 10), Position = UDim2.new(0, 0, 0, 0)}), "Second"), 
 		AddThemeObject(SetProps(MakeElement("Frame"), {Size = UDim2.new(0, 10, 1, 0), Position = UDim2.new(1, -10, 0, 0)}), "Second"), 
 		AddThemeObject(SetProps(MakeElement("Frame"), {Size = UDim2.new(0, 1, 1, 0), Position = UDim2.new(1, -1, 0, 0)}), "Stroke"), 
@@ -512,13 +512,13 @@ function OrionLib:MakeWindow(WindowConfig)
 		TabConfig.Icon = TabConfig.Icon or ""
 		TabConfig.PremiumOnly = TabConfig.PremiumOnly or false
 
-		local TabFrame = SetChildren(SetProps(MakeElement("Button"), {Size = UDim2.new(1, 0, 0, 30), Parent = TabHolder}), {
-			AddThemeObject(SetProps(MakeElement("Image", TabConfig.Icon), {AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(0, 10, 0.5, 0), ImageTransparency = 0.4, Name = "Ico"}), "Text")
+		local TabFrame = SetChildren(SetProps(MakeElement("Button"), {Size = UDim2.new(1, 0, 0, 24), Parent = TabHolder}), {
+			AddThemeObject(SetProps(MakeElement("Image", TabConfig.Icon), {AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(0.5, 0, 0.5, 0), ImageTransparency = 0.4, Name = "Ico"}), "Text")
 		})
 
 		if GetIcon(TabConfig.Icon) then TabFrame.Ico.Image = GetIcon(TabConfig.Icon) end	
 
-		local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 5), {Size = UDim2.new(1, -120, 1, -40), Position = UDim2.new(0, 120, 0, 40), Parent = MainWindow, Visible = false, Name = "ItemContainer"}), {
+		local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 5), {Size = UDim2.new(1, -80, 1, -40), Position = UDim2.new(0, 80, 0, 40), Parent = MainWindow, Visible = false, Name = "ItemContainer"}), {
 			MakeElement("List", 0, 6),
 			MakeElement("Padding", 10, 10, 10, 10)
 		}), "Divider")
@@ -529,7 +529,6 @@ function OrionLib:MakeWindow(WindowConfig)
 
 		if FirstTab then
 			FirstTab = false
-			TabFrame.Ico.ImageTransparency = 0
 			TabFrame.Ico.ImageTransparency = 0
 			Container.Visible = true
 		end    
