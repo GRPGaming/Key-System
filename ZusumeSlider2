@@ -1012,6 +1012,7 @@ end)
 				}), "Second")
 
 				AddConnection(Click.MouseEnter, function()
+    AddConnection(Click.MouseEnter, function()
     TweenService:Create(ButtonFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
 end)
 
