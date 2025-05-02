@@ -8,10 +8,12 @@ local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 
-local function isInputValid(input)
-    return input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch
-end
+local TWEEN_TIME = 0.3
+local COLORS = {
+    ButtonIdle = Color3.fromRGB(114, 137, 218),
+    ButtonHover = Color3.fromRGB(129, 152, 233),
+    ButtonClick = Color3.fromRGB(99, 122, 203)
+}
 
 local OrionLib = {
 	Elements = {},
@@ -104,52 +106,48 @@ task.spawn(function()
 end)
 
 -- Modifikasi drag untuk Android dan PC
-local function AddDraggingFunctionality(DragPoint, Main)  
-    pcall(function()  
-        local isDragging = false  
-        local dragStart, startPos  
+local function AddDraggingFunctionality(DragPoint, Main)
+    pcall(function()
+        local isDragging = false
+        local dragStart, startPos
 
-        -- START DRAG  
-        DragPoint.InputBegan:Connect(function(input)  
-            if isInputValid(input) then  
-                isDragging = true  
-                dragStart = input.Position  
-                startPos = Main.Position  
+        -- Universal input handler (works for both Mouse and Touch)
+        local function updateInput(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                return true
+            end
+            return false
+        end
 
-                -- Efek visual saat drag mulai  
-                TweenService:Create(Main, TweenInfo.new(0.1), {  
-                    BackgroundTransparency = 0.9  
-                }):Play()  
-            end  
-        end)  
+        DragPoint.InputBegan:Connect(function(input)
+            if updateInput(input) then
+                isDragging = true
+                dragStart = input.Position
+                startPos = Main.Position
+            end
+        end)
 
-        -- UPDATE POSISI  
-        UserInputService.InputChanged:Connect(function(input)  
-            if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement  
-               or input.UserInputType == Enum.UserInputType.Touch) then  
-                local delta = input.Position - dragStart  
-                Main.Position = UDim2.new(  
-                    startPos.X.Scale,  
-                    startPos.X.Offset + delta.X,  
-                    startPos.Y.Scale,  
-                    startPos.Y.Offset + delta.Y  
-                )  
-            end  
-        end)  
+        UserInputService.InputChanged:Connect(function(input)
+            if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                local delta = input.Position - dragStart
+                TweenService:Create(Main, TweenInfo.new(0.1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    Position = UDim2.new(
+                        startPos.X.Scale,
+                        startPos.X.Offset + delta.X,
+                        startPos.Y.Scale,
+                        startPos.Y.Offset + delta.Y
+                    )
+                }):Play()
+            end
+        end)
 
-        -- STOP DRAG  
-        UserInputService.InputEnded:Connect(function(input)  
-            if isInputValid(input) then  
-                isDragging = false  
-
-                -- Kembalikan efek visual  
-                TweenService:Create(Main, TweenInfo.new(0.3), {  
-                    BackgroundTransparency = 0.7  
-                }):Play()  
-            end  
-        end)  
-    end)  
-end  
+        UserInputService.InputEnded:Connect(function(input)
+            if updateInput(input) then
+                isDragging = false
+            end
+        end)
+    end)
+end
 
 
 local function Create(Name, Properties, Children)
@@ -1013,37 +1011,31 @@ end)
 					Click
 				}), "Second")
 
-				AddConnection(Button.MouseEnter, function()  
-        TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {  
-            BackgroundColor3 = Color3.fromRGB(60, 60, 60)  
-        }):Play()  
-    end)  
+				AddConnection(Click.MouseEnter, function()
+    TweenService:Create(ButtonFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+end)
 
-    AddConnection(Button.MouseLeave, function()  
-        TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {  
-            BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second  
-        }):Play()  
-    end)  
+AddConnection(Click.MouseLeave, function()
+    TweenService:Create(ButtonFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonIdle}):Play()
+end)
 
-    -- [BARU] Universal click  
-    AddConnection(Button.InputBegan, function(input)  
-        if isInputValid(input) then  
-            TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {  
-                BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
-            }):Play()  
-        end  
-    end)  
+AddConnection(Click.MouseButton1Down, function()
+    TweenService:Create(ButtonFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonClick}):Play()
+end)
 
-    AddConnection(Button.InputEnded, function(input)  
-        if isInputValid(input) then  
-            TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {  
-                BackgroundColor3 = Color3.fromRGB(60, 60, 60)  
-            }):Play()  
-            ButtonConfig.Callback()  
-        end  
-    end)  
-end  
-			
+AddConnection(Click.MouseButton1Up, function()
+    TweenService:Create(ButtonFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+    spawn(function()
+        ButtonConfig.Callback()
+    end)
+end)
+
+				function Button:Set(ButtonText)
+					ButtonFrame.Content.Text = ButtonText
+				end	
+
+				return Button
+			end    
 			function ElementFunction:AddToggle(ToggleConfig)
 				ToggleConfig = ToggleConfig or {}
 				ToggleConfig.Name = ToggleConfig.Name or "Toggle"
@@ -1110,24 +1102,22 @@ end
 				Toggle:Set(Toggle.Value)
 
 				AddConnection(Click.MouseEnter, function()
-					TweenService:Create(ToggleFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3)}):Play()
-				end)
+    TweenService:Create(ToggleFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+end)
 
-				AddConnection(Click.MouseLeave, function()
-					TweenService:Create(ToggleFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}):Play()
-				end)
+AddConnection(Click.MouseLeave, function()
+    TweenService:Create(ToggleFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonIdle}):Play()
+end)
 
-				AddConnection(Click.InputBegan, function(input)  
-        if isInputValid(input) then  
-            Toggle:Set(not Toggle.Value)  
-            SaveCfg(game.GameId)  
-        end  
-    end)  
-end  
+AddConnection(Click.MouseButton1Down, function()
+    TweenService:Create(ToggleFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonClick}):Play()
+end)
 
-				AddConnection(Click.MouseButton1Down, function()
-					TweenService:Create(ToggleFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6)}):Play()
-				end)
+AddConnection(Click.MouseButton1Up, function()
+    TweenService:Create(ToggleFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+    SaveCfg(game.GameId)
+    Toggle:Set(not Toggle.Value)
+end)
 
 				if ToggleConfig.Flag then
 					OrionLib.Flags[ToggleConfig.Flag] = Toggle
@@ -1330,7 +1320,6 @@ end)
 					DropdownContainer.CanvasSize = UDim2.new(0, 0, 0, DropdownList.AbsoluteContentSize.Y)
 				end)  
 
-
 				local function AddOptions(Options)
 					for _, Option in pairs(Options) do
 						local OptionBtn = AddThemeObject(SetProps(SetChildren(MakeElement("Button", Color3.fromRGB(40, 40, 40)), {
@@ -1391,15 +1380,29 @@ end)
 					return DropdownConfig.Callback(Dropdown.Value)
 				end
 
-				AddConnection(Click.InputBegan, function(input)  
-        if isInputValid(input) then  
-            Dropdown.Toggled = not Dropdown.Toggled  
-            TweenService:Create(DropdownFrame, TweenInfo.new(0.2), {  
-                Size = Dropdown.Toggled and UDim2.new(1,0,0,148) or UDim2.new(1,0,0,38)  
-            }):Play()  
-        end  
-    end)  
-end  
+				AddConnection(Click.MouseEnter, function()
+    TweenService:Create(DropdownFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+end)
+
+AddConnection(Click.MouseLeave, function()
+    TweenService:Create(DropdownFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonIdle}):Play()
+end)
+
+AddConnection(Click.MouseButton1Down, function()
+    TweenService:Create(DropdownFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonClick}):Play()
+end)
+
+AddConnection(Click.MouseButton1Up, function()
+    TweenService:Create(DropdownFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+    Dropdown.Toggled = not Dropdown.Toggled
+    DropdownFrame.F.Line.Visible = Dropdown.Toggled
+    TweenService:Create(DropdownFrame.F.Ico,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Rotation = Dropdown.Toggled and 180 or 0}):Play()
+    if #Dropdown.Options > MaxElements then
+        TweenService:Create(DropdownFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Dropdown.Toggled and UDim2.new(1, 0, 0, 38 + (MaxElements * 28)) or UDim2.new(1, 0, 0, 38)}):Play()
+    else
+        TweenService:Create(DropdownFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Dropdown.Toggled and UDim2.new(1, 0, 0, DropdownList.AbsoluteContentSize.Y + 38) or UDim2.new(1, 0, 0, 38)}):Play()
+    end
+end)
 
 				Dropdown:Refresh(Dropdown.Options, false)
 				Dropdown:Set(Dropdown.Value)
@@ -1458,7 +1461,7 @@ end
 				end)
 
 				AddConnection(Click.InputEnded, function(Input)
-					if isInputValid(input) then
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 						if Bind.Binding then return end
 						Bind.Binding = true
 						BindBox.Value.Text = ""
@@ -1502,20 +1505,23 @@ end
 				end)
 
 				AddConnection(Click.MouseEnter, function()
-					TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3)}):Play()
-				end)
+    TweenService:Create(BindFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+end)
 
-				AddConnection(Click.MouseLeave, function()
-					TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}):Play()
-				end)
+AddConnection(Click.MouseLeave, function()
+    TweenService:Create(BindFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonIdle}):Play()
+end)
 
-				AddConnection(Click.MouseButton1Up, function()
-					TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3)}):Play()
-				end)
+AddConnection(Click.MouseButton1Down, function()
+    TweenService:Create(BindFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonClick}):Play()
+end)
 
-				AddConnection(Click.MouseButton1Down, function()
-					TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6)}):Play()
-				end)
+AddConnection(Click.MouseButton1Up, function()
+    TweenService:Create(BindFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+    if Bind.Binding then return end
+    Bind.Binding = true
+    BindBox.Value.Text = ""
+end)
 
 				function Bind:Set(Key)
 					Bind.Binding = false
@@ -1593,21 +1599,21 @@ end
 				TextboxActual.Text = TextboxConfig.Default
 
 				AddConnection(Click.MouseEnter, function()
-					TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3)}):Play()
-				end)
+    TweenService:Create(TextboxFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+end)
 
-				AddConnection(Click.MouseLeave, function()
-					TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}):Play()
-				end)
+AddConnection(Click.MouseLeave, function()
+    TweenService:Create(TextboxFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonIdle}):Play()
+end)
 
-				AddConnection(Click.MouseButton1Up, function()
-					TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3)}):Play()
-					TextboxActual:CaptureFocus()
-				end)
+AddConnection(Click.MouseButton1Down, function()
+    TweenService:Create(TextboxFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonClick}):Play()
+end)
 
-				AddConnection(Click.MouseButton1Down, function()
-					TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6)}):Play()
-				end)
+AddConnection(Click.MouseButton1Up, function()
+    TweenService:Create(TextboxFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+    TextboxActual:CaptureFocus()
+end)
 			end 
 			function ElementFunction:AddColorpicker(ColorpickerConfig)
 				ColorpickerConfig = ColorpickerConfig or {}
@@ -1713,13 +1719,26 @@ end
 					AddThemeObject(MakeElement("Stroke"), "Stroke"),
 				}), "Second")
 
-				AddConnection(Click.MouseButton1Click, function()
-					Colorpicker.Toggled = not Colorpicker.Toggled
-					TweenService:Create(ColorpickerFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Colorpicker.Toggled and UDim2.new(1, 0, 0, 148) or UDim2.new(1, 0, 0, 38)}):Play()
-					Color.Visible = Colorpicker.Toggled
-					Hue.Visible = Colorpicker.Toggled
-					ColorpickerFrame.F.Line.Visible = Colorpicker.Toggled
-				end)
+				AddConnection(Click.MouseEnter, function()
+    TweenService:Create(ColorpickerFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+end)
+
+AddConnection(Click.MouseLeave, function()
+    TweenService:Create(ColorpickerFrame, TweenInfo.new(TWEEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonIdle}):Play()
+end)
+
+AddConnection(Click.MouseButton1Down, function()
+    TweenService:Create(ColorpickerFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonClick}):Play()
+end)
+
+AddConnection(Click.MouseButton1Up, function()
+    TweenService:Create(ColorpickerFrame, TweenInfo.new(TWEEN_TIME/2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = COLORS.ButtonHover}):Play()
+    Colorpicker.Toggled = not Colorpicker.Toggled
+    TweenService:Create(ColorpickerFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Colorpicker.Toggled and UDim2.new(1, 0, 0, 148) or UDim2.new(1, 0, 0, 38)}):Play()
+    Color.Visible = Colorpicker.Toggled
+    Hue.Visible = Colorpicker.Toggled
+    ColorpickerFrame.F.Line.Visible = Colorpicker.Toggled
+end)
 
 				local function UpdateColorPicker()
 					ColorpickerBox.BackgroundColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
@@ -1734,7 +1753,7 @@ end
 				ColorV = 1 - (math.clamp(ColorSelection.AbsolutePosition.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) / Color.AbsoluteSize.Y)
 
 				AddConnection(Color.InputBegan, function(input)
-					if isInputValid(input) then
+					if input.UserInputType == Enum.UserInputType.MouseButton1 then
 						if ColorInput then
 							ColorInput:Disconnect()
 						end
@@ -1750,7 +1769,7 @@ end
 				end)
 
 				AddConnection(Color.InputEnded, function(input)
-					if isInputValid(input) then
+					if input.UserInputType == Enum.UserInputType.MouseButton1 then
 						if ColorInput then
 							ColorInput:Disconnect()
 						end
@@ -1758,7 +1777,7 @@ end
 				end)
 
 				AddConnection(Hue.InputBegan, function(input)
-					if isInputValid(input) then
+					if input.UserInputType == Enum.UserInputType.MouseButton1 then
 						if HueInput then
 							HueInput:Disconnect()
 						end;
@@ -1775,7 +1794,7 @@ end
 				end)
 
 				AddConnection(Hue.InputEnded, function(input)
-					if isInputValid(input) then
+					if input.UserInputType == Enum.UserInputType.MouseButton1 then
 						if HueInput then
 							HueInput:Disconnect()
 						end
