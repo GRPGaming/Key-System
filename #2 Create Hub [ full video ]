@@ -1,0 +1,74 @@
+-- Load Orion Library
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/GRPGaming/Key-System/refs/heads/Xycer-Hub-Script/ZusumeLib(Slider)"))()
+
+-- Services
+local RunService = game:GetService("RunService")
+local Player = game.Players.LocalPlayer
+
+-- Configuration
+local desiredWalkSpeed = 16
+local speedhackConnection = nil
+
+-- Create UI
+local Window = OrionLib:MakeWindow({
+    Name = "Main Hack",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "MainHackConfig"
+})
+
+local MainTab = Window:MakeTab({
+    Name = "Main Hack",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- SpeedHack System
+MainTab:AddToggle({
+    Name = "SpeedHack",
+    Default = false,
+    Save = true,
+    Flag = "speedhack_toggle",
+    Callback = function(Value)
+        if Value then
+            -- Start RenderStepped loop
+            speedhackConnection = RunService.RenderStepped:Connect(function()
+                if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+                    Player.Character.Humanoid.WalkSpeed = desiredWalkSpeed
+                end
+            end)
+        else
+            -- Cleanup connection
+            if speedhackConnection then
+                speedhackConnection:Disconnect()
+                speedhackConnection = nil
+            end
+            -- Reset walkspeed
+            if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+                Player.Character.Humanoid.WalkSpeed = 16
+            end
+        end
+    end
+})
+
+MainTab:AddSlider({
+    Name = "SpeedHack Multiplier",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    Save = true,
+    Flag = "speedhack_slider",
+    ValueName = "Speed",
+    Callback = function(Value)
+        desiredWalkSpeed = Value
+        -- Immediately update if active
+        if speedhackConnection and Player.Character and Player.Character:FindFirstChild("Humanoid") then
+            Player.Character.Humanoid.WalkSpeed = Value
+        end
+    end
+})
+
+-- Initialize UI
+OrionLib:Init()
