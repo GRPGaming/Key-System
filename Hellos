@@ -1899,7 +1899,7 @@ instructions.Text = "1. Theres must be founded items nearest"
 instructions.Parent = TeleportGUILibrary.ContentFrame
 instructions.ZIndex = 5
 
-positionY = positionY + 25
+positionY = positionY + 40
 
 -- Duplication Settings
 local sectionLabel, separator = TeleportGUILibrary.createSection("Player Setting & ESP", positionY)
