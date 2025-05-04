@@ -1272,11 +1272,11 @@ instructions.TextSize = 14
 instructions.Font = Enum.Font.SourceSans
 instructions.TextWrapped = true
 instructions.TextXAlignment = Enum.TextXAlignment.Left
-instructions.Text = "1. Theres must have detected mobs nearest you want to duplicate\n2. click 2-3x "Duplicate it" if its not auto duplicate"
+instructions.Text = "1. Theres must have detected mobs nearest you want to duplicate\n2. click 2-3x 'Duplicate it' if its not auto duplicate"
 instructions.Parent = TeleportGUILibrary.ContentFrame
 instructions.ZIndex = 5
 
-positionY = positionY + 40
+positionY = positionY + 
 
 local sectionLabel, separator = TeleportGUILibrary.createSection("Teleportation Options", positionY)
 positionY = positionY + 30
