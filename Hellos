@@ -432,11 +432,11 @@ instructions.TextSize = 14
 instructions.Font = Enum.Font.SourceSans
 instructions.TextWrapped = true
 instructions.TextXAlignment = Enum.TextXAlignment.Left
-instructions.Text = "1. Added Soldier,Zombie, Soldier Duplicate & Resizer\n2. Added Train Color Modifier\n3. Added Teleport Option"
+instructions.Text = "1. Added Soldier+Zombie Duplicate & Resizer\n2. Added Train Color Modifier\n3. Added Teleport Option"
 instructions.Parent = TeleportGUILibrary.ContentFrame
 instructions.ZIndex = 5
 
-positionY = positionY + 60
+positionY = positionY + 62
 
 local sectionLabel, separator = TeleportGUILibrary.createSection("Train Color", positionY)
 positionY = positionY + 30
