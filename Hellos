@@ -418,7 +418,7 @@ end
 
 -- Train Color Section
 local positionY = 10
-local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instructions", positionY)
+local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Update Logs v2", positionY)
 positionY = positionY + 30
 
 -- Create instructions text label
@@ -432,11 +432,11 @@ instructions.TextSize = 14
 instructions.Font = Enum.Font.SourceSans
 instructions.TextWrapped = true
 instructions.TextXAlignment = Enum.TextXAlignment.Left
-instructions.Text = "1. Click 'Clone Player' to create a duplicate of your character\n2. Enter a size value in 'Resize Clone' (e.g. 2 for double size)\n3. Click 'Apply Size' to resize all clones\n4. Use 'Remove All Clones' when finished"
+instructions.Text = "1. Added Train Color Modifier\n2. Added Mobs Duplicate & Resizer\n3. Added Teleport Option"
 instructions.Parent = TeleportGUILibrary.ContentFrame
 instructions.ZIndex = 5
 
-positionY = positionY + 25
+positionY = positionY + 60
 
 local sectionLabel, separator = TeleportGUILibrary.createSection("Train Color", positionY)
 positionY = positionY + 30
