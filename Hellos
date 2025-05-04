@@ -1882,7 +1882,7 @@ checkbox.ZIndex = 5
 positionY = positionY + 35
 
 local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instruction! ~~~~~~~~~~~~~~~~", positionY)
-positionY = positionY + 30
+positionY = positionY + 10
 
 -- Create instructions text label
 local instructions = Instance.new("TextLabel")
