@@ -418,6 +418,26 @@ end
 
 -- Train Color Section
 local positionY = 10
+local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instructions", positionY)
+positionY = positionY + 30
+
+-- Create instructions text label
+local instructions = Instance.new("TextLabel")
+instructions.Name = "InstructionsText"
+instructions.Size = UDim2.new(0.9, 0, 0, 60)
+instructions.Position = UDim2.new(0.05, 0, 0, positionY)
+instructions.BackgroundTransparency = 1
+instructions.TextColor3 = Color3.fromRGB(200, 200, 200)
+instructions.TextSize = 14
+instructions.Font = Enum.Font.SourceSans
+instructions.TextWrapped = true
+instructions.TextXAlignment = Enum.TextXAlignment.Left
+instructions.Text = "1. Click 'Clone Player' to create a duplicate of your character\n2. Enter a size value in 'Resize Clone' (e.g. 2 for double size)\n3. Click 'Apply Size' to resize all clones\n4. Use 'Remove All Clones' when finished"
+instructions.Parent = TeleportGUILibrary.ContentFrame
+instructions.ZIndex = 5
+
+positionY = positionY + 25
+
 local sectionLabel, separator = TeleportGUILibrary.createSection("Train Color", positionY)
 positionY = positionY + 30
 
@@ -1256,27 +1276,6 @@ local resetDuplicatesButton = TeleportGUILibrary.createButton(
 )
 resetDuplicatesButton.ZIndex = 5
 positionY = positionY + 40
-
--- Instructions Section
-local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instructions", positionY)
-positionY = positionY + 32
-
--- Create instructions text label
-local instructions = Instance.new("TextLabel")
-instructions.Name = "InstructionsText"
-instructions.Size = UDim2.new(0.9, 0, 0, 60)
-instructions.Position = UDim2.new(0.05, 0, 0, positionY)
-instructions.BackgroundTransparency = 1
-instructions.TextColor3 = Color3.fromRGB(200, 200, 200)
-instructions.TextSize = 14
-instructions.Font = Enum.Font.SourceSans
-instructions.TextWrapped = true
-instructions.TextXAlignment = Enum.TextXAlignment.Left
-instructions.Text = "1. Click 'Clone Player' to create a duplicate of your character\n2. Enter a size value in 'Resize Clone' (e.g. 2 for double size)\n3. Click 'Apply Size' to resize all clones\n4. Use 'Remove All Clones' when finished"
-instructions.Parent = TeleportGUILibrary.ContentFrame
-instructions.ZIndex = 5
-
-positionY = positionY + 50
 
 local sectionLabel, separator = TeleportGUILibrary.createSection("Teleportation Options", positionY)
 positionY = positionY + 30
