@@ -2094,6 +2094,26 @@ local thirdPersonCheckbox, thirdPersonMethods = TeleportGUILibrary.createCheckbo
 thirdPersonCheckbox.ZIndex = 5
 positionY = positionY + 35
 
+local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("About this script!", positionY)
+positionY = positionY + 30
+
+-- Create instructions text label
+local instructions = Instance.new("TextLabel")
+instructions.Name = "InstructionsText"
+instructions.Size = UDim2.new(0.9, 0, 0, 60)
+instructions.Position = UDim2.new(0.05, 0, 0, positionY)
+instructions.BackgroundTransparency = 1
+instructions.TextColor3 = Color3.fromRGB(200, 200, 200)
+instructions.TextSize = 14
+instructions.Font = Enum.Font.SourceSans
+instructions.TextWrapped = true
+instructions.TextXAlignment = Enum.TextXAlignment.Left
+instructions.Text = "[+] Made by Zysume \n[+] Best Partner: Artificial Intellegence\n[+] Credit TeslaLab: mrpopcat14"
+instructions.Parent = TeleportGUILibrary.ContentFrame
+instructions.ZIndex = 5
+
+positionY = positionY + 62
+
 -- Update CanvasSize to fit all content
 TeleportGUILibrary.updateCanvasSize(positionY)
 
