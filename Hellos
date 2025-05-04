@@ -1277,7 +1277,7 @@ local resetDuplicatesButton = TeleportGUILibrary.createButton(
 resetDuplicatesButton.ZIndex = 5
 positionY = positionY + 40
 
-local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instruction! ~~~~~~~~~~~", positionY)
+local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instruction! ~~~~~~~~~~~~~~~~", positionY)
 positionY = positionY + 30
 
 -- Create instructions text label
@@ -1423,6 +1423,7 @@ positionY = positionY + 30 -- Reduced spacing after section (25 for label + 1 fo
 
 -- Create Dropdown: "Items Resizer" with expanded options
 local dropdownOptions = {
+    "Default",
     "Gold Bar",
     "Silver Bar",
     "Gold Statue",
@@ -1632,8 +1633,8 @@ local duplicationInProgress = false
 local countdownTimer = nil
 local duplicatedCount = 0
 local currentDelay = 1
-local selectedItemType = "GoldBar"
-local availableItems = {"GoldBar", "SilverBar", "Bond", "Coal", "Statue", "MaximGun", "Wolf", "Teapot", "Painting", "Barrel", "RevolverAmmo"}
+local selectedItemType = "Default"
+local availableItems = {"Default", "GoldBar", "SilverBar", "Bond", "Coal", "Statue", "MaximGun", "Wolf", "Teapot", "Painting", "Barrel", "RevolverAmmo"}
 local autoUpdateList = false
 
 -- Function to get all available item types in RuntimeItems
@@ -1644,7 +1645,7 @@ local function updateAvailableItems()
     end
     
     -- Keep the list as is - no dynamic updating
-    availableItems = {"All Items", "GoldBar", "SilverBar", "Bond", "Coal", "Statue", "MaximGun", "Wolf", "Teapot", "Painting", "Barrel", "RevolverAmmo"}
+    availableItems = {"Default", "All Items", "GoldBar", "SilverBar", "Bond", "Coal", "Statue", "MaximGun", "Wolf", "Teapot", "Painting", "Barrel", "RevolverAmmo"}
     
     -- Update dropdown with items
     if dropdownMethods then
@@ -1879,6 +1880,26 @@ local checkbox, checkboxMethods = TeleportGUILibrary.createCheckbox(
 )
 checkbox.ZIndex = 5
 positionY = positionY + 35
+
+local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instruction! ~~~~~~~~~~~~~~~~", positionY)
+positionY = positionY + 30
+
+-- Create instructions text label
+local instructions = Instance.new("TextLabel")
+instructions.Name = "InstructionsText"
+instructions.Size = UDim2.new(0.9, 0, 0, 60)
+instructions.Position = UDim2.new(0.05, 0, 0, positionY)
+instructions.BackgroundTransparency = 1
+instructions.TextColor3 = Color3.fromRGB(200, 200, 200)
+instructions.TextSize = 14
+instructions.Font = Enum.Font.SourceSans
+instructions.TextWrapped = true
+instructions.TextXAlignment = Enum.TextXAlignment.Left
+instructions.Text = "1. Theres must be founded items nearest"
+instructions.Parent = TeleportGUILibrary.ContentFrame
+instructions.ZIndex = 5
+
+positionY = positionY + 25
 
 -- Duplication Settings
 local sectionLabel, separator = TeleportGUILibrary.createSection("Player Setting & ESP", positionY)
