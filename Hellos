@@ -6,7 +6,7 @@ local TopBar = TeleportGUILibrary.ContentFrame.Parent.Parent:FindFirstChild("Top
 if TopBar then
     local Title = TopBar:FindFirstChild("Title")
     if Title then
-        Title.Text = "Dead Rails"
+        Title.Text = "Dead Rails v2"
     end
 end
 
@@ -1259,6 +1259,127 @@ local resetDuplicatesButton = TeleportGUILibrary.createButton(
     end
 )
 resetDuplicatesButton.ZIndex = 5
+positionY = positionY + 40
+
+local sectionLabel, separator = TeleportGUILibrary.createSection("Teleportation Options", positionY)
+positionY = positionY + 30
+
+-- Teleportation Dropdown (Highest ZIndex)
+local teleportOptions = {"Default", "Your Train", "TeslaLab"}
+local selectedTeleportOption = teleportOptions[1]
+local teleportDropdown, teleportDropdownMethods = TeleportGUILibrary.createDropdown(
+    "TeleportDropdown",
+    "Teleportation",
+    teleportOptions,
+    selectedTeleportOption,
+    UDim2.new(0.05, 0, 0, positionY),
+    TeleportGUILibrary.ContentFrame,
+    function(option)
+        selectedTeleportOption = option
+        TeleportGUILibrary.createNotification("Selected: " .. option, "info")
+    end
+)
+teleportDropdown.ZIndex = 10
+local dropdownBG = teleportDropdown:FindFirstChild("Background", true)
+if dropdownBG then
+    dropdownBG.ZIndex = 11
+    local menu = dropdownBG:FindFirstChild("MenuContainer")
+    if menu then
+        menu.ZIndex = 20
+        local scroll = menu:FindFirstChild("OptionsScrollFrame")
+        if scroll then
+            scroll.ZIndex = 21
+            for _, child in ipairs(scroll:GetChildren()) do
+                if child:IsA("TextButton") then
+                    child.ZIndex = 22
+                end
+            end
+        end
+    end
+end
+positionY = positionY + 35
+
+-- Apply Teleport Button
+local applyTeleportButton = TeleportGUILibrary.createButton(
+    "ApplyTeleportButton",
+    "Apply Teleport Zone",
+    UDim2.new(0.05, 0, 0, positionY),
+    TeleportGUILibrary.ContentFrame,
+    function()
+        if selectedTeleportOption == "Default" then
+            -- Default option does nothing
+            TeleportGUILibrary.createNotification("Default option selected", "info")
+        elseif selectedTeleportOption == "Your Train" then
+            -- Your Train teleport functionality
+            local player = game.Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            
+            -- Find train seat
+            local trainSeat
+            for _, model in pairs(workspace:GetChildren()) do
+                if model:IsA("Model") then
+                    local reqComponents = model:FindFirstChild("RequiredComponents")
+                    if reqComponents then
+                        local controls = reqComponents:FindFirstChild("Controls")
+                        if controls then
+                            local conductorSeat = controls:FindFirstChild("ConductorSeat")
+                            if conductorSeat then
+                                local vehicleSeat = conductorSeat:FindFirstChild("VehicleSeat")
+                                if vehicleSeat then
+                                    trainSeat = vehicleSeat
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            
+            -- Teleport to train if found
+            if trainSeat then
+                local targetCFrame = trainSeat.CFrame
+                local startTime = tick()
+                local endTime = startTime + 3 -- Spam teleport for 3 seconds
+                
+                -- Start teleporting
+                TeleportGUILibrary.createNotification("Teleporting to your train...", "info")
+                
+                -- Spam teleport for 3 seconds
+                while tick() < endTime do
+                    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                    if humanoidRootPart then
+                        humanoidRootPart.CFrame = targetCFrame
+                    end
+                    task.wait()
+                end
+                
+                TeleportGUILibrary.createNotification("Teleport complete", "success")
+            else
+                TeleportGUILibrary.createNotification("Could not find your train", "error")
+            end
+        elseif selectedTeleportOption == "TeslaLab" then
+            -- TeslaLab teleport functionality
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Script made by mrpopcat14",
+                Text = "Enjoy the script :)",
+                Duration = 5
+            })
+            
+            local p,g,l=game:GetService("Players"),game:GetService("RunService"),game.Players.LocalPlayer 
+            local c=l.Character or l.CharacterAdded:Wait() local h=c:WaitForChild("Humanoid") 
+            local r=c:WaitForChild("HumanoidRootPart") 
+            local t,b,d,n,s=false,nil,nil,nil,0 
+            local x=Vector3.new(-424.39,27.5,-49040.54) 
+            local function j()for _,o in ipairs(workspace:GetDescendants())do if(o:IsA("Model")or o:IsA("BasePart"))and o.Name:lower():find("tesla")then local q=o:IsA("Model")and(o.PrimaryPart or o:FindFirstChildWhichIsA("BasePart"))or o if q then return q end end end end 
+            local function k()for _,o in ipairs(workspace:GetDescendants())do if o.Name:lower():find("brainjar")or o.Name:lower():find("jar")then local q=o:IsA("Model")and(o.PrimaryPart or o:FindFirstChildWhichIsA("BasePart"))or o if q then return q end end end end 
+            local function m(f)if d then d:Disconnect()end local u=r.Position s=tick() t=true d=g.Heartbeat:Connect(function()if h.Sit or h.SeatPart then if d then d:Disconnect()end t=false return end 
+            local e=math.min(1,(tick()-s)/2) local v=u:Lerp(f.Position,e) r.CFrame=CFrame.new(v)*(f-f.Position) if e>=1 then if d then d:Disconnect()end t=false end end)end local function w(y)local z,A=nil,math.huge local B=y:IsA("BasePart")and y.Position or y:GetPivot().Position for _,o in pairs(workspace:GetDescendants())do if o:IsA("Seat")and not o.Occupant then 
+            local C=(o.Position-B).Magnitude if C<50 and C<A then A=C z=o end end end if z then r.CFrame=z.CFrame+Vector3.new(0,3,0)task.wait(0.1)z:Sit(h)return true end return false end local function i()m(CFrame.new(x))repeat task.wait()until not t while true do if h.Sit or h.SeatPart then repeat task.wait(0.5)until not h.Sit and not h.SeatPart end n=j()b=k()or n if not n then task.wait(1)continue end 
+            local D=n:IsA("BasePart")and n.CFrame or n:GetPivot()m(D+Vector3.new(0,3,0))repeat task.wait()until not t if w(b)then task.wait(1)break end task.wait(0.2)end end l.CharacterAdded:Connect(function(E)c=E h=E:WaitForChild("Humanoid")r=E:WaitForChild("HumanoidRootPart")if d then d:Disconnect()end t=false end)i()
+        end
+    end
+)
+applyTeleportButton.ZIndex = 5
 positionY = positionY + 40
 
 local sectionLabel, separator = TeleportGUILibrary.createSection("Resizer Option", positionY)
