@@ -1257,6 +1257,27 @@ local resetDuplicatesButton = TeleportGUILibrary.createButton(
 resetDuplicatesButton.ZIndex = 5
 positionY = positionY + 40
 
+-- Instructions Section
+local instructionsSectionLabel, instructionsSeparator = TeleportGUILibrary.createSection("Instructions", positionY)
+positionY = positionY + 32
+
+-- Create instructions text label
+local instructions = Instance.new("TextLabel")
+instructions.Name = "InstructionsText"
+instructions.Size = UDim2.new(0.9, 0, 0, 60)
+instructions.Position = UDim2.new(0.05, 0, 0, positionY)
+instructions.BackgroundTransparency = 1
+instructions.TextColor3 = Color3.fromRGB(200, 200, 200)
+instructions.TextSize = 14
+instructions.Font = Enum.Font.SourceSans
+instructions.TextWrapped = true
+instructions.TextXAlignment = Enum.TextXAlignment.Left
+instructions.Text = "1. Theres must have detected mobs nearest you want to duplicate\n2. click 2-3x "Duplicate it" if its not auto duplicate"
+instructions.Parent = TeleportGUILibrary.ContentFrame
+instructions.ZIndex = 5
+
+positionY = positionY + 40
+
 local sectionLabel, separator = TeleportGUILibrary.createSection("Teleportation Options", positionY)
 positionY = positionY + 30
 
