@@ -62,10 +62,6 @@ local PlayerESPFolder = Instance.new("Folder")
 PlayerESPFolder.Name = "PlayerESPFolder"
 PlayerESPFolder.Parent = game.CoreGui
 
-local ZombieHighlightFolder = Instance.new("Folder")
-ZombieHighlightFolder.Name = "ZombieHighlightFolder"
-ZombieHighlightFolder.Parent = game.CoreGui
-
 -- Function to create ESP for an item
 local function createItemESP(item)
     -- Skip if it's not a Model, if it has a Humanoid, or if it's a Bond
@@ -1967,12 +1963,32 @@ local function stealCoalOnce()
         return
     end
     
-    -- Find FireBase position
-    local fireBase = workspace.Train.Train:FindFirstChild("FireBase")
-    if not fireBase then
-        stealingInProgress = false
-        return
+-- Find FireBase position
+local function findFireBase()
+    -- Search for FireBase in the new path structure
+    local trainModel = workspace:FindFirstChildOfClass("Model") -- Assuming the random model name is a direct child of workspace
+    if trainModel then
+        local fireBase = trainModel:FindFirstChild("Visual")
+        if fireBase then
+            fireBase = fireBase:FindFirstChild("Main")
+            if fireBase then
+                fireBase = fireBase:FindFirstChild("FireBase")
+                if fireBase then
+                    return fireBase
+                end
+            end
+        end
     end
+    
+    stealingInProgress = false
+    return nil
+end
+
+local fireBase = findFireBase()
+if not fireBase then
+    stealingInProgress = false
+    return
+end
     
     -- Teleport coal to FireBase once
     if closestCoal:IsA("Model") and closestCoal.PrimaryPart then
@@ -2083,34 +2099,6 @@ local espPlayerCheckbox, espPlayerMethods = TeleportGUILibrary.createCheckbox(
         else
             PlayerESPFolder:ClearAllChildren()
             TeleportGUILibrary.createNotification("Player ESP disabled!", "info")
-        end
-    end
-)
-
-positionY = positionY + 35
-
--- Create "Show Nearest Zombie" checkbox (replacing "Teleport to Selected Item")
-local showNearestZombieCheckbox, showNearestZombieMethods = TeleportGUILibrary.createCheckbox(
-    "ShowNearestZombie",
-    "Show Nearest Zombie",
-    UDim2.new(0.05, 0, 0, positionY),
-    TeleportGUILibrary.ContentFrame,
-    function(isChecked)
-        ZombieHighlightEnabled = isChecked
-        if isChecked then
-            updateNearestZombieHighlight()
-            TeleportGUILibrary.createNotification("Nearest zombie highlight enabled!", "success")
-            
-            -- Create a loop to constantly update the nearest zombie
-            spawn(function()
-                while ZombieHighlightEnabled do
-                    updateNearestZombieHighlight()
-                    wait(0.5) -- Update every half second
-                end
-            end)
-        else
-            ZombieHighlightFolder:ClearAllChildren()
-            TeleportGUILibrary.createNotification("Nearest zombie highlight disabled!", "info")
         end
     end
 )
@@ -2263,7 +2251,7 @@ workspace.ChildAdded:Connect(function(child)
         end
         
         if ZombieHighlightEnabled then
-            updateNearestZombieHighlight()
+            
         end
     elseif child.Name == "Ore" and ESPEnabled then
         wait(1)
@@ -2281,9 +2269,7 @@ if workspace:FindFirstChild("RuntimeItems") then
         updateBondESP()
     end
     
-    if ZombieHighlightEnabled then
-        updateNearestZombieHighlight()
-    end
+    
 end
 
 -- Set up player ESP listeners
