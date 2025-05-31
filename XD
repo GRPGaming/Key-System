@@ -21,11 +21,11 @@ local Input = Instance.new("TextBox")
 local Button = Instance.new("TextButton")
 local Footer = Instance.new("TextLabel")
 local Close = Instance.new("TextButton")
-local Minimize = Instance.new("TextButton") -- Added Minimize Button
+local Minimize = Instance.new("TextButton")
 
 -- Frame setup
 Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 255) -- Changed to blue
+Frame.BackgroundColor3 = Color3.fromRGB(128, 0, 128) -- Purple
 Frame.Position = UDim2.new(0.35, 0, 0.3, 0)
 Frame.Size = UDim2.new(0, 250, 0, 180)
 Frame.ClipsDescendants = true
@@ -45,6 +45,7 @@ Title.Font = Enum.Font.FredokaOne
 Title.Text = "Seed Spawner"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextScaled = true
+Title.TextSize = 14 -- Make text thinner
 
 -- Close Button (X)
 Close.Parent = Frame
@@ -63,24 +64,20 @@ end)
 
 -- Minimize Button
 Minimize.Parent = Frame
-Minimize.Position = UDim2.new(1, -58, 0, 5)
+Minimize.Position = UDim2.new(1, -60, 0, 5)
 Minimize.Size = UDim2.new(0, 24, 0, 24)
-Minimize.BackgroundColor3 = Color3.fromRGB(80, 80, 255)
+Minimize.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
 Minimize.Text = "-"
 Minimize.Font = Enum.Font.FredokaOne
 Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
 Minimize.TextScaled = true
 local minimizeCorner = Instance.new("UICorner", Minimize)
 minimizeCorner.CornerRadius = UDim.new(1, 0)
-local minimized = false
 
+local minimized = false
 Minimize.MouseButton1Click:Connect(function()
-    if minimized then
-        Frame.Size = UDim2.new(0, 250, 0, 180) -- Restore size
-    else
-        Frame.Size = UDim2.new(0, 250, 0, 40) -- Minimize size
-    end
     minimized = not minimized
+    Frame.Visible = not minimized
 end)
 
 -- Input Box
@@ -97,7 +94,7 @@ inputCorner.CornerRadius = UDim.new(0, 8)
 
 -- Spawn Button
 Button.Parent = Frame
-Button.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+Button.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Green
 Button.Position = UDim2.new(0.1, 0, 0.55, 0)
 Button.Size = UDim2.new(0.8, 0, 0, 35)
 Button.Font = Enum.Font.FredokaOne
@@ -113,7 +110,7 @@ Footer.BackgroundTransparency = 1
 Footer.Position = UDim2.new(0, 0, 0.88, 0)
 Footer.Size = UDim2.new(1, 0, 0, 20)
 Footer.Font = Enum.Font.FredokaOne
-Footer.Text = "Made by Zapcide" -- Changed text
+Footer.Text = "Made By Unbekannter_lpz"
 Footer.TextColor3 = Color3.fromRGB(200, 200, 200)
 Footer.TextScaled = true
 
@@ -140,8 +137,8 @@ Button.MouseButton1Click:Connect(function()
             -- Clone the seed and make it the handle
             local handle = seedPart:Clone()
             handle.Name = "Handle"
-            handle.Size = handle.Size * 1.5 -- Make the seed bigger
             handle.Parent = fakeTool
+            handle.Size = handle.Size * 1.5 -- Make seed bigger
 
             -- Equip the fake tool (client-side)
             local humanoid = char:FindFirstChildOfClass("Humanoid")
