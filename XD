@@ -1,0 +1,160 @@
+local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local backpack = player:WaitForChild("Backpack")
+
+-- Clean up old GUI if already present
+if CoreGui:FindFirstChild("SeedSpawnerUI") then
+    CoreGui.SeedSpawnerUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "SeedSpawnerUI"
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local Title = Instance.new("TextLabel")
+local Input = Instance.new("TextBox")
+local Button = Instance.new("TextButton")
+local Footer = Instance.new("TextLabel")
+local Close = Instance.new("TextButton")
+local Minimize = Instance.new("TextButton") -- Added Minimize Button
+
+-- Frame setup
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 255) -- Changed to blue
+Frame.Position = UDim2.new(0.35, 0, 0.3, 0)
+Frame.Size = UDim2.new(0, 250, 0, 180)
+Frame.ClipsDescendants = true
+Frame.Active = true
+Frame.Draggable = true
+
+-- Rounded corners
+UICorner.Parent = Frame
+UICorner.CornerRadius = UDim.new(0, 12)
+
+-- Title
+Title.Parent = Frame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.FredokaOne
+Title.Text = "Seed Spawner"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextScaled = true
+
+-- Close Button (X)
+Close.Parent = Frame
+Close.Position = UDim2.new(1, -28, 0, 5)
+Close.Size = UDim2.new(0, 24, 0, 24)
+Close.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+Close.Text = "X"
+Close.Font = Enum.Font.FredokaOne
+Close.TextColor3 = Color3.fromRGB(255, 255, 255)
+Close.TextScaled = true
+local closeCorner = Instance.new("UICorner", Close)
+closeCorner.CornerRadius = UDim.new(1, 0)
+Close.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Minimize Button
+Minimize.Parent = Frame
+Minimize.Position = UDim2.new(1, -58, 0, 5)
+Minimize.Size = UDim2.new(0, 24, 0, 24)
+Minimize.BackgroundColor3 = Color3.fromRGB(80, 80, 255)
+Minimize.Text = "-"
+Minimize.Font = Enum.Font.FredokaOne
+Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+Minimize.TextScaled = true
+local minimizeCorner = Instance.new("UICorner", Minimize)
+minimizeCorner.CornerRadius = UDim.new(1, 0)
+local minimized = false
+
+Minimize.MouseButton1Click:Connect(function()
+    if minimized then
+        Frame.Size = UDim2.new(0, 250, 0, 180) -- Restore size
+    else
+        Frame.Size = UDim2.new(0, 250, 0, 40) -- Minimize size
+    end
+    minimized = not minimized
+end)
+
+-- Input Box
+Input.Parent = Frame
+Input.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+Input.Position = UDim2.new(0.1, 0, 0.3, 0)
+Input.Size = UDim2.new(0.8, 0, 0, 30)
+Input.Font = Enum.Font.FredokaOne
+Input.Text = ""
+Input.TextColor3 = Color3.fromRGB(0, 0, 0)
+Input.TextScaled = true
+local inputCorner = Instance.new("UICorner", Input)
+inputCorner.CornerRadius = UDim.new(0, 8)
+
+-- Spawn Button
+Button.Parent = Frame
+Button.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+Button.Position = UDim2.new(0.1, 0, 0.55, 0)
+Button.Size = UDim2.new(0.8, 0, 0, 35)
+Button.Font = Enum.Font.FredokaOne
+Button.Text = "Spawn Seed"
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.TextScaled = true
+local buttonCorner = Instance.new("UICorner", Button)
+buttonCorner.CornerRadius = UDim.new(0, 8)
+
+-- Footer
+Footer.Parent = Frame
+Footer.BackgroundTransparency = 1
+Footer.Position = UDim2.new(0, 0, 0.88, 0)
+Footer.Size = UDim2.new(1, 0, 0, 20)
+Footer.Font = Enum.Font.FredokaOne
+Footer.Text = "Made by Zapcide" -- Changed text
+Footer.TextColor3 = Color3.fromRGB(200, 200, 200)
+Footer.TextScaled = true
+
+-- Spawn Logic
+Button.MouseButton1Click:Connect(function()
+    local seedName = Input.Text
+    if seedName == "" then
+        warn("Please enter a seed name.")
+        return
+    end
+
+    print("Attempting to spawn seed:", seedName)
+
+    local SeedModels = ReplicatedStorage:FindFirstChild("Seed_Models")
+    if SeedModels then
+        local seedPart = SeedModels:FindFirstChild(seedName)
+        if seedPart then
+            -- Create a fake Tool with custom name format
+            local fakeTool = Instance.new("Tool")
+            fakeTool.Name = seedName .. " Seed [x1]"
+            fakeTool.RequiresHandle = true
+            fakeTool.Parent = backpack
+
+            -- Clone the seed and make it the handle
+            local handle = seedPart:Clone()
+            handle.Name = "Handle"
+            handle.Size = handle.Size * 1.5 -- Make the seed bigger
+            handle.Parent = fakeTool
+
+            -- Equip the fake tool (client-side)
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:EquipTool(fakeTool)
+                print("Now visually holding the seed as a Tool!")
+            else
+                warn("No Humanoid found in character.")
+            end
+        else
+            warn(seedName .. " not found in Seed_Models")
+        end
+    else
+        warn("Seed_Models folder not found")
+    end
+end)
