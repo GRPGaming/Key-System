@@ -1249,44 +1249,8 @@ CloseButton_Lootlabs.TextSize = 18
 CloseButton_Lootlabs.ZIndex = 102
 
 -- Efek tombol untuk CopyLinkButton (Linkvertise dan Lootlabs)
-setupButtonEffects(CopyLinkButton_Linkvertise)
-setupButtonEffects(CopyLinkButton_Lootlabs)
 
 -- Efek hover untuk tombol tutup (Linkvertise)
-CloseButton_Linkvertise.MouseEnter:Connect(function()
-    local hover = game:GetService("TweenService"):Create(
-        CloseButton_Linkvertise,
-        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
-        {TextColor3 = Color3.fromRGB(255, 100, 100)}
-    )
-    hover:Play()
-end)
-CloseButton_Linkvertise.MouseLeave:Connect(function()
-    local unhover = game:GetService("TweenService"):Create(
-        CloseButton_Linkvertise,
-        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
-        {TextColor3 = Color3.fromRGB(255, 255, 255)}
-    )
-    unhover:Play()
-end)
-
--- Efek hover untuk tombol tutup (Lootlabs)
-CloseButton_Lootlabs.MouseEnter:Connect(function()
-    local hover = game:GetService("TweenService"):Create(
-        CloseButton_Lootlabs,
-        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
-        {TextColor3 = Color3.fromRGB(255, 100, 100)}
-    )
-    hover:Play()
-end)
-CloseButton_Lootlabs.MouseLeave:Connect(function()
-    local unhover = game:GetService("TweenService"):Create(
-        CloseButton_Lootlabs,
-        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
-        {TextColor3 = Color3.fromRGB(255, 255, 255)}
-    )
-    unhover:Play()
-end)
 
         -- Setup LoadingFrame
         LoadingFrame.Name = "LoadingFrame"
@@ -1351,7 +1315,9 @@ end)
         setupButtonEffects(PasteButton)
         setupButtonEffects(CopyDiscordButton)
         setupButtonEffects(CopyLinkButton)
-        
+        setupButtonEffects(CopyLinkButton_Linkvertise)
+setupButtonEffects(CopyLinkButton_Lootlabs)
+
         local function copyDiscordLink()
             if fSetClipboard then
                 pcall(function()
@@ -1407,6 +1373,42 @@ local function smoothAnimateButtonClick(button, originalColor, clickColor, durat
         tweenToOriginal:Play()
     end)
 end
+
+CloseButton_Linkvertise.MouseEnter:Connect(function()
+    local hover = game:GetService("TweenService"):Create(
+        CloseButton_Linkvertise,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
+        {TextColor3 = Color3.fromRGB(255, 100, 100)}
+    )
+    hover:Play()
+end)
+CloseButton_Linkvertise.MouseLeave:Connect(function()
+    local unhover = game:GetService("TweenService"):Create(
+        CloseButton_Linkvertise,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
+        {TextColor3 = Color3.fromRGB(255, 255, 255)}
+    )
+    unhover:Play()
+end)
+
+-- Efek hover untuk tombol tutup (Lootlabs)
+CloseButton_Lootlabs.MouseEnter:Connect(function()
+    local hover = game:GetService("TweenService"):Create(
+        CloseButton_Lootlabs,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
+        {TextColor3 = Color3.fromRGB(255, 100, 100)}
+    )
+    hover:Play()
+end)
+CloseButton_Lootlabs.MouseLeave:Connect(function()
+    local unhover = game:GetService("TweenService"):Create(
+        CloseButton_Lootlabs,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
+        {TextColor3 = Color3.fromRGB(255, 255, 255)}
+    )
+    unhover:Play()
+end)
+
 
 CloseButton_Linkvertise.MouseButton1Click:Connect(function()
     local fadeOut = game:GetService("TweenService"):Create(
